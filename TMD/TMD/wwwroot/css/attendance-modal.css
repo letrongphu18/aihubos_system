@@ -1,0 +1,480 @@
+﻿/* Attendance Modal - Modern Design với màu đỏ nhạt & vàng nhạt */
+
+:root {
+    --att-primary: #ff6b6b;
+    --att-success: #51cf66;
+    --att-danger: #ff6b6b;
+    --att-warning: #ffd93d;
+    --att-info: #74c0fc;
+    --att-dark: #2d3436;
+    --att-white: #ffffff;
+    --att-gray-100: #f1f3f5;
+    --att-gray-200: #e9ecef;
+    --att-gray-600: #868e96;
+    --att-gray-700: #495057;
+    --att-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --att-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --att-radius-sm: 8px;
+    --att-radius-md: 12px;
+    --att-radius-lg: 16px;
+}
+
+/* ===== MODAL OVERRIDE ===== */
+.att-modal .modal-content {
+    border: none;
+    border-radius: var(--att-radius-lg);
+    overflow: hidden;
+}
+
+.att-modal-header {
+    background: linear-gradient(135deg, var(--att-primary), #ff8787);
+    color: white;
+    padding: 24px 28px;
+    border-bottom: none;
+}
+
+.att-modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+    .att-modal-title i {
+        font-size: 24px;
+    }
+
+.att-modal-body {
+    padding: 28px;
+    background: var(--att-white);
+}
+
+.modal-footer {
+    padding: 20px 28px;
+    background: var(--att-gray-100);
+    border-top: 2px solid var(--att-gray-200);
+}
+
+/* ===== USER CARD ===== */
+.att-user-card {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.08), rgba(255, 217, 61, 0.08));
+    border-radius: var(--att-radius-lg);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 2px solid var(--att-gray-200);
+}
+
+.att-user-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--att-primary), #ff8787);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 32px;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+    .att-user-avatar-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .att-user-avatar-large span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        text-transform: uppercase;
+    }
+
+.att-user-card-info {
+    flex: 1;
+}
+
+.att-user-card-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--att-dark);
+    margin-bottom: 12px;
+}
+
+.att-user-card-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.att-user-card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--att-gray-700);
+}
+
+    .att-user-card-meta-item i {
+        color: var(--att-primary);
+        font-size: 16px;
+    }
+
+/* ===== DETAIL SECTION ===== */
+.att-detail-section {
+    background: var(--att-gray-100);
+    border-radius: var(--att-radius-lg);
+    padding: 24px;
+    height: 100%;
+}
+
+.att-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--att-dark);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--att-gray-200);
+}
+
+    .att-section-title i {
+        font-size: 20px;
+    }
+
+/* ===== INFO GROUP ===== */
+.att-info-group {
+    margin-bottom: 20px;
+}
+
+    .att-info-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .att-info-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--att-gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+        .att-info-group label i {
+            color: var(--att-primary);
+            font-size: 14px;
+        }
+
+    .att-info-group p {
+        font-size: 14px;
+        color: var(--att-dark);
+        margin: 0;
+        line-height: 1.6;
+        padding: 12px 16px;
+        background: white;
+        border-radius: var(--att-radius-sm);
+        border-left: 3px solid var(--att-primary);
+    }
+
+.att-text-info {
+    background: rgba(116, 192, 252, 0.08) !important;
+    border-left-color: var(--att-info) !important;
+}
+
+/* ===== COORDINATES ===== */
+.att-coordinates {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--att-gray-700);
+    background: rgba(255, 107, 107, 0.05) !important;
+}
+
+/* ===== PHOTO PREVIEW ===== */
+.att-photo-preview {
+    background: white;
+    border-radius: var(--att-radius-md);
+    overflow: hidden;
+    border: 2px solid var(--att-gray-200);
+}
+
+    .att-photo-preview img {
+        width: 100%;
+        height: auto;
+        display: block;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+        .att-photo-preview img:hover {
+            transform: scale(1.05);
+        }
+
+/* ===== STATUS CONTAINER ===== */
+.att-status-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.att-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--att-shadow-sm);
+}
+
+    .att-status-badge i {
+        font-size: 16px;
+    }
+
+    .att-status-badge.completed {
+        background: rgba(81, 207, 102, 0.15);
+        color: #2b8a3e;
+        border: 2px solid var(--att-success);
+    }
+
+    .att-status-badge.partial {
+        background: rgba(255, 217, 61, 0.15);
+        color: #e67700;
+        border: 2px solid var(--att-warning);
+    }
+
+    .att-status-badge.late {
+        background: rgba(255, 107, 107, 0.15);
+        color: #c92a2a;
+        border: 2px solid var(--att-danger);
+    }
+
+    .att-status-badge.ontime {
+        background: rgba(81, 207, 102, 0.15);
+        color: #2b8a3e;
+        border: 2px solid var(--att-success);
+    }
+
+    .att-status-badge.outside {
+        background: rgba(255, 107, 107, 0.15);
+        color: #c92a2a;
+        border: 2px solid var(--att-danger);
+    }
+
+    .att-status-badge.inside {
+        background: rgba(81, 207, 102, 0.15);
+        color: #2b8a3e;
+        border: 2px solid var(--att-success);
+    }
+
+/* ===== BUTTONS ===== */
+.att-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--att-radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.att-btn-primary {
+    background: linear-gradient(135deg, var(--att-info), #74c0fc);
+    color: white;
+    box-shadow: var(--att-shadow-sm);
+}
+
+    .att-btn-primary:hover {
+        background: linear-gradient(135deg, #1864ab, var(--att-info));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(116, 192, 252, 0.4);
+    }
+
+.att-btn-success {
+    background: linear-gradient(135deg, var(--att-success), #51cf66);
+    color: white;
+    box-shadow: var(--att-shadow-sm);
+}
+
+    .att-btn-success:hover {
+        background: linear-gradient(135deg, #2b8a3e, var(--att-success));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(81, 207, 102, 0.4);
+        color: white;
+    }
+
+.att-btn-secondary {
+    background: var(--att-gray-200);
+    color: var(--att-dark);
+}
+
+    .att-btn-secondary:hover {
+        background: var(--att-gray-300);
+        transform: translateY(-2px);
+    }
+
+/* ===== MAP CONTAINER ===== */
+.att-map-container {
+    width: 100%;
+    height: 500px;
+    border-radius: var(--att-radius-md);
+    overflow: hidden;
+    border: 2px solid var(--att-gray-200);
+    box-shadow: var(--att-shadow-md);
+}
+
+.att-map-info {
+    background: var(--att-gray-100);
+    padding: 20px;
+    border-radius: var(--att-radius-md);
+}
+
+    .att-map-info strong {
+        color: var(--att-dark);
+        font-weight: 700;
+    }
+
+    .att-map-info p {
+        color: var(--att-gray-700);
+        margin: 0;
+    }
+
+/* ===== LEAFLET CUSTOMIZATION ===== */
+.leaflet-popup-content-wrapper {
+    border-radius: var(--att-radius-md);
+    box-shadow: var(--att-shadow-md);
+}
+
+.leaflet-popup-content {
+    font-size: 14px;
+    color: var(--att-dark);
+}
+
+    .leaflet-popup-content b {
+        color: var(--att-primary);
+    }
+
+/* Override Leaflet circle color */
+.leaflet-interactive[fill="#5e72e4"] {
+    fill: var(--att-primary) !important;
+    stroke: var(--att-primary) !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .att-modal-body {
+        padding: 20px;
+    }
+
+    .att-user-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .att-user-card-name {
+        font-size: 20px;
+    }
+
+    .att-user-card-meta {
+        justify-content: center;
+    }
+
+    .att-detail-section {
+        padding: 20px;
+    }
+
+    .att-section-title {
+        font-size: 15px;
+    }
+
+    .att-map-container {
+        height: 350px;
+    }
+
+    .att-status-container {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .att-modal-header,
+    .att-modal-body,
+    .modal-footer {
+        padding: 16px;
+    }
+
+    .att-user-avatar-large {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+    }
+
+    .att-user-card-name {
+        font-size: 18px;
+    }
+
+    .att-map-container {
+        height: 300px;
+    }
+
+    .att-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.att-modal .modal-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.att-detail-section,
+.att-user-card {
+    animation: slideUp 0.4s ease-out;
+}
