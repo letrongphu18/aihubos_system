@@ -1,0 +1,263 @@
+﻿@model List<AIHUBOS.Models.Task>
+@{
+    ViewData["Title"] = "Thùng rác - Công việc đã xóa";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .recycle-bin-container {
+        padding: 20px;
+    }
+
+    .recycle-header {
+        background: linear-gradient(135deg, #868f96 0%, #596164 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .deleted-task-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        opacity: 0.8;
+        border-left: 5px solid #6c757d;
+    }
+
+        .deleted-task-card:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+            transition: all 0.3s;
+        }
+</style>
+
+<div class="recycle-bin-container">
+    <!-- HEADER -->
+    <div class="recycle-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2><i class="fas fa-trash-restore"></i> Thùng rác</h2>
+                <p class="mb-0">Các công việc đã bị xóa (ẩn) - Có thể khôi phục hoặc xóa vĩnh viễn</p>
+            </div>
+            <div class="col-auto">
+                <a href="@Url.Action("TaskList")" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="alert alert-secondary">
+                <h4 class="mb-0">@(Model?.Count ?? 0)</h4>
+                <p class="mb-0"><i class="fas fa-trash"></i> Công việc đã xóa</p>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="alert alert-info">
+                <strong><i class="fas fa-info-circle"></i> Lưu ý:</strong>
+                <ul class="mb-0">
+                    <li>Các công việc ở đây chỉ bị ẩn, chưa bị xóa vĩnh viễn</li>
+                    <li>Bạn có thể khôi phục hoặc xóa vĩnh viễn</li>
+                    <li>Xóa vĩnh viễn sẽ không thể khôi phục</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETED TASKS LIST -->
+    <div class="row">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h4>Thùng rác trống!</h4>
+                    <p>Không có công việc nào bị xóa</p>
+                    <a href="@Url.Action("TaskList")" class="btn btn-primary">
+                        <i class="fas fa-list"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var task in Model)
+            {
+                <div class="col-12">
+                    <div class="deleted-task-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h5 class="mb-2">
+                                    <span class="badge bg-secondary me-2">
+                                        @(task.Priority switch
+                                        {
+                                            "Urgent" => "🔥",
+                                            "High" => "⚠️",
+                                            "Medium" => "📌",
+                                            "Low" => "📋",
+                                            _ => "📄"
+                                        })
+                                        @task.Priority
+                                    </span>
+                                    @task.TaskName
+                                    <span class="badge bg-danger ms-2">
+                                        <i class="fas fa-trash"></i> Đã xóa
+                                    </span>
+                                </h5>
+
+                                @if (!string.IsNullOrEmpty(task.Description))
+                                {
+                                    <p class="text-muted mb-2 small">@task.Description</p>
+                                }
+
+                                @if (!string.IsNullOrEmpty(task.Platform))
+                                {
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-layer-group"></i> @task.Platform
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="col-md-3">
+                                @if (task.Deadline.HasValue)
+                                {
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-calendar-alt"></i> Deadline:
+                                    </small>
+                                    <strong>@task.Deadline.Value.ToString("dd/MM/yyyy HH:mm")</strong>
+                                }
+
+                                @if (task.CreatedAt.HasValue)
+                                {
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="fas fa-clock"></i> Tạo lúc: @task.CreatedAt.Value.ToString("dd/MM/yyyy")
+                                    </small>
+                                }
+                            </div>
+
+                            <div class="col-md-3 text-end">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success"
+                                            onclick="restoreTask(@task.TaskId, '@task.TaskName')"
+                                            title="Khôi phục">
+                                        <i class="fas fa-trash-restore"></i> Khôi phục
+                                    </button>
+                                    <button type="button" class="btn btn-danger"
+                                            onclick="permanentDelete(@task.TaskId, '@task.TaskName')"
+                                            title="Xóa vĩnh viễn">
+                                        <i class="fas fa-trash-alt"></i> Xóa vĩnh viễn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function restoreTask(taskId, taskName) {
+            Swal.fire({
+                title: 'Khôi phục công việc?',
+                html: `Bạn có chắc muốn khôi phục:<br/><strong>"${taskName}"</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash-restore"></i> Khôi phục',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("RestoreTask")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ taskId: taskId }),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã khôi phục!',
+                                    text: response.message,
+                                    timer: 1500
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire('Lỗi!', response.message, 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Lỗi!', 'Có lỗi xảy ra!', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function permanentDelete(taskId, taskName) {
+            Swal.fire({
+                title: 'XÓA VĨNH VIỄN?',
+                html: `<div class="alert alert-danger">
+                    <strong>⚠️ CẢNH BÁO:</strong> Hành động này KHÔNG THỂ KHÔI PHỤC!
+                </div>
+                Bạn có CHẮC CHẮN muốn xóa vĩnh viễn:<br/>
+                <strong>"${taskName}"</strong>?<br/>
+                <small class="text-muted">Tất cả dữ liệu liên quan sẽ bị xóa hoàn toàn khỏi hệ thống!</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash-alt"></i> Xóa vĩnh viễn',
+                cancelButtonText: 'Hủy',
+                input: 'checkbox',
+                inputPlaceholder: 'Tôi hiểu và chấp nhận xóa vĩnh viễn',
+                inputValidator: (result) => {
+                    return !result && 'Bạn phải xác nhận để tiếp tục!'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Đang xóa...',
+                        html: 'Vui lòng đợi',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: '@Url.Action("PermanentDeleteTask")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ taskId: taskId }),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã xóa vĩnh viễn!',
+                                    text: response.message,
+                                    timer: 1500
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire('Lỗi!', response.message, 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa!', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}
