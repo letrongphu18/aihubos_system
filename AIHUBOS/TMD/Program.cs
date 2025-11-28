@@ -16,7 +16,8 @@ builder.Services.AddControllersWithViews();
 // Database Context
 builder.Services.AddDbContext<AihubSystemContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+// Program.cs
+builder.Services.AddScoped<AIHUBOS.Services.INotificationService, AIHUBOS.Services.NotificationService>();
 // ============================================
 // 2. SESSION CONFIGURATION
 // ============================================

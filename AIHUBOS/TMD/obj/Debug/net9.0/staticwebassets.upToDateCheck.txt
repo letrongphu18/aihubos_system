@@ -2,7 +2,6 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dis
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\salary.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
-E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\departmen-list.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\user-management.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\pending-requests.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
@@ -17,6 +16,7 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\js\resetpass.js
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\tasklist-ad.css
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\task-create.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\jquery-validation\dist\jquery.validate.js
@@ -37,6 +37,7 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\js\verify-otp.js
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\admin-request.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\reset-password.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\reset-user-password.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\register-reset.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
@@ -78,9 +79,12 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dis
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\staff-dashboard.css
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\department-list.css
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\departmen-detail.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\my-department.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\jquery-validation\LICENSE.md
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\recycle-bin.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\css\staff-requests.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
@@ -101,7 +105,8 @@ wwwroot\css\attendance-modal.css
 wwwroot\css\audit-logs.css
 wwwroot\css\auth-page.css
 wwwroot\css\dashboard-management.css
-wwwroot\css\departmen-list.css
+wwwroot\css\departmen-detail.css
+wwwroot\css\department-list.css
 wwwroot\css\edittask-ad.css
 wwwroot\css\fg-pass.css
 wwwroot\css\layout.css
@@ -112,14 +117,17 @@ wwwroot\css\my-department.css
 wwwroot\css\passwordresethistory.css
 wwwroot\css\pending-requests.css
 wwwroot\css\profile.css
+wwwroot\css\recycle-bin.css
 wwwroot\css\register-reset.css
 wwwroot\css\requestcard.css
 wwwroot\css\reset-password.css
+wwwroot\css\reset-user-password.css
 wwwroot\css\salary.css
 wwwroot\css\setting.css
 wwwroot\css\site.css
 wwwroot\css\staff-dashboard.css
 wwwroot\css\staff-requests.css
+wwwroot\css\task-create.css
 wwwroot\css\tasklist-ad.css
 wwwroot\css\tasklist-staff.css
 wwwroot\css\user-management.css
@@ -202,6 +210,8 @@ wwwroot\uploads\attendance\12_20251124_113424_checkin.jpg
 wwwroot\uploads\attendance\14_20251121_202839_checkin.jpg
 wwwroot\uploads\attendance\15_20251121_210659_checkin.jpg
 wwwroot\uploads\attendance\15_20251121_213522_checkout.jpg
+wwwroot\uploads\attendance\3_20251127_141009_checkin.jpg
+wwwroot\uploads\attendance\3_20251127_235420_checkout.jpg
 wwwroot\uploads\attendance\9_20251116_015000_checkin.jpg
 wwwroot\uploads\attendance\9_20251116_015018_checkout.jpg
 wwwroot\uploads\attendance\9_20251117_133031_checkin.jpg
@@ -221,4 +231,5 @@ wwwroot\uploads\attendance\9_20251123_021821_checkin.jpg
 wwwroot\uploads\attendance\9_20251123_222326_checkout.jpg
 wwwroot\uploads\attendance\9_20251124_014027_checkin.jpg
 wwwroot\uploads\avatars\11_20251124124412.png
+wwwroot\uploads\avatars\2_20251127135614.png
 wwwroot\uploads\avatars\9_20251124141835.png

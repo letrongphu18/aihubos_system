@@ -2,7 +2,7 @@
   "Files": [
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\obj\\Debug\\net9.0\\scopedcss\\projectbundle\\AIHUBOS.bundle.scp.css",
-      "PackagePath": "staticwebassets\\AIHUBOS.y3sew5ib6l.bundle.scp.css"
+      "PackagePath": "staticwebassets\\AIHUBOS.m09ypmwwe7.bundle.scp.css"
     },
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\admin-request.css",
@@ -33,8 +33,12 @@
       "PackagePath": "staticwebassets\\css\\dashboard-management.css"
     },
     {
-      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\departmen-list.css",
-      "PackagePath": "staticwebassets\\css\\departmen-list.css"
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\departmen-detail.css",
+      "PackagePath": "staticwebassets\\css\\departmen-detail.css"
+    },
+    {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\department-list.css",
+      "PackagePath": "staticwebassets\\css\\department-list.css"
     },
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\edittask-ad.css",
@@ -77,6 +81,10 @@
       "PackagePath": "staticwebassets\\css\\profile.css"
     },
     {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\recycle-bin.css",
+      "PackagePath": "staticwebassets\\css\\recycle-bin.css"
+    },
+    {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\register-reset.css",
       "PackagePath": "staticwebassets\\css\\register-reset.css"
     },
@@ -87,6 +95,10 @@
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\reset-password.css",
       "PackagePath": "staticwebassets\\css\\reset-password.css"
+    },
+    {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\reset-user-password.css",
+      "PackagePath": "staticwebassets\\css\\reset-user-password.css"
     },
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\salary.css",
@@ -107,6 +119,10 @@
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\staff-requests.css",
       "PackagePath": "staticwebassets\\css\\staff-requests.css"
+    },
+    {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\task-create.css",
+      "PackagePath": "staticwebassets\\css\\task-create.css"
     },
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\css\\tasklist-ad.css",
@@ -437,6 +453,14 @@
       "PackagePath": "staticwebassets\\uploads\\attendance\\15_20251121_213522_checkout.jpg"
     },
     {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\uploads\\attendance\\3_20251127_141009_checkin.jpg",
+      "PackagePath": "staticwebassets\\uploads\\attendance\\3_20251127_141009_checkin.jpg"
+    },
+    {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\uploads\\attendance\\3_20251127_235420_checkout.jpg",
+      "PackagePath": "staticwebassets\\uploads\\attendance\\3_20251127_235420_checkout.jpg"
+    },
+    {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\uploads\\attendance\\9_20251116_015000_checkin.jpg",
       "PackagePath": "staticwebassets\\uploads\\attendance\\9_20251116_015000_checkin.jpg"
     },
@@ -511,6 +535,10 @@
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\uploads\\avatars\\11_20251124124412.png",
       "PackagePath": "staticwebassets\\uploads\\avatars\\11_20251124124412.png"
+    },
+    {
+      "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\uploads\\avatars\\2_20251127135614.png",
+      "PackagePath": "staticwebassets\\uploads\\avatars\\2_20251127135614.png"
     },
     {
       "Id": "E:\\AIHUB TASK\\AIHUBCHAMCONG\\aihubos_system\\AIHUBOS\\TMD\\wwwroot\\uploads\\avatars\\9_20251124141835.png",

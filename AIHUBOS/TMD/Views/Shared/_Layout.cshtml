@@ -179,17 +179,14 @@
 
         // --- ✅ ADMIN SIGNALR NOTIFICATION LOGIC ---
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
-        var adminNotifications = []; // Lưu trữ thông báo
+        var adminNotifications = [];
 
         connection.on("ReceiveMessage", function (title, message, type, link) {
-            // 1. Sound
             var audio = document.getElementById("adminNotifSound");
             if(audio) audio.play().catch(e => console.log("Cần tương tác"));
 
-            // 2. Toast
             showAdminToast(title, message, type);
 
-            // 3. Lưu thông báo
             var notif = {
                 id: Date.now(),
                 title: title,
@@ -201,44 +198,36 @@
             };
             adminNotifications.unshift(notif);
 
-            // 4. Cập nhật badge
             updateNotifBadge();
-
-            // 5. Render list
             renderNotifList();
         });
 
         connection.start().catch(err => console.error(err.toString()));
 
-        // Theme Toggle
-        function toggleTheme() {
-            const body = document.body;
-            const themeIcon = document.querySelector('#themeToggle i');
+        // ✅ LOAD NOTIFICATIONS FROM DATABASE
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/Admin/GetMyNotifications?skip=0&take=20');
+                const data = await response.json();
 
-            body.classList.toggle('dark-mode');
+                if (data.success) {
+                    adminNotifications = data.notifications.map(n => ({
+                        id: n.id,
+                        title: n.title,
+                        message: n.message,
+                        type: n.type,
+                        link: n.link,
+                        time: new Date(n.time),
+                        read: n.read
+                    }));
 
-            if (body.classList.contains('dark-mode')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
+                    updateNotifBadge();
+                    renderNotifList();
+                }
+            } catch (e) {
+                console.error('Failed to load notifications:', e);
             }
         }
-
-        // Load saved theme
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('theme');
-            const themeIcon = document.querySelector('#themeToggle i');
-
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            }
-        });
 
         function updateNotifBadge() {
             var unreadCount = adminNotifications.filter(n => !n.read).length;
@@ -262,7 +251,9 @@
             adminNotifications.slice(0, 20).forEach(function(notif) {
                 var timeStr = getTimeAgo(notif.time);
                 var readClass = notif.read ? 'read' : 'unread';
-                var linkAttr = notif.link ? `onclick="handleNotifClick(${notif.id}, '${notif.link}')"` : `onclick="markAsRead(${notif.id})"`;
+                var linkAttr = notif.link
+                    ? `onclick="handleNotifClick(${notif.id}, '${notif.link}')" style="cursor:pointer"`
+                    : `onclick="markAsRead(${notif.id})" style="cursor:pointer"`;
 
                 html += `
                     <div class="notif-item ${readClass}" ${linkAttr}>
@@ -284,19 +275,43 @@
             }
         }
 
-        function markAsRead(id) {
+        async function markAsRead(id) {
             var notif = adminNotifications.find(n => n.id === id);
             if (notif && !notif.read) {
                 notif.read = true;
                 updateNotifBadge();
                 renderNotifList();
+
+                // ✅ LƯU VÀO DATABASE
+                try {
+                    await fetch('/Admin/MarkNotificationAsRead', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(id)
+                    });
+                } catch (e) {
+                    console.error('Failed to mark as read:', e);
+                }
             }
         }
 
-        function clearAllNotifications() {
+        async function clearAllNotifications() {
+            var hasUnread = adminNotifications.some(n => !n.read);
+
             adminNotifications.forEach(n => n.read = true);
             updateNotifBadge();
             renderNotifList();
+
+            // ✅ CHỈ GỌI API NẾU CÓ THÔNG BÁO CHƯA ĐỌC
+            if (hasUnread) {
+                try {
+                    await fetch('/Admin/MarkAllNotificationsAsRead', {
+                        method: 'POST'
+                    });
+                } catch (e) {
+                    console.error('Failed to mark all as read:', e);
+                }
+            }
         }
 
         function getTimeAgo(date) {
@@ -325,6 +340,40 @@
             container.appendChild(div);
             setTimeout(() => div.remove(), 5000);
         }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('#themeToggle i');
+
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // ✅ LOAD KHI TRANG VỪA MỞ
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.querySelector('#themeToggle i');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+
+            // Load notifications
+            loadNotifications();
+        });
     </script>
 </body>
 </html>

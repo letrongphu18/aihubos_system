@@ -27,6 +27,8 @@ public partial class AihubSystemContext : DbContext
 
     public virtual DbSet<LoginHistory> LoginHistories { get; set; }
 
+    public virtual DbSet<Notification> Notifications { get; set; }
+
     public virtual DbSet<OvertimeRequest> OvertimeRequests { get; set; }
 
     public virtual DbSet<PasswordResetHistory> PasswordResetHistories { get; set; }
@@ -54,6 +56,8 @@ public partial class AihubSystemContext : DbContext
     public virtual DbSet<Task> Tasks { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
     public virtual DbSet<UserSalarySetting> UserSalarySettings { get; set; }
 
@@ -240,6 +244,17 @@ public partial class AihubSystemContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.LoginHistories)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__LoginHist__UserI__37703C52");
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E1248FF5E01");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.Link).HasMaxLength(500);
+            entity.Property(e => e.Message).HasMaxLength(1000);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Type).HasMaxLength(50);
         });
 
         modelBuilder.Entity<OvertimeRequest>(entity =>
@@ -595,6 +610,20 @@ public partial class AihubSystemContext : DbContext
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Users__RoleId__498EEC8D");
+        });
+
+        modelBuilder.Entity<UserNotification>(entity =>
+        {
+            entity.HasKey(e => e.UserNotificationId).HasName("PK__UserNoti__EB2986294F44D7A6");
+
+            entity.HasIndex(e => e.IsRead, "IX_UserNotifications_IsRead");
+
+            entity.HasIndex(e => e.UserId, "IX_UserNotifications_UserId");
+
+            entity.HasOne(d => d.Notification).WithMany(p => p.UserNotifications)
+                .HasForeignKey(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserNotifications_Notifications");
         });
 
         modelBuilder.Entity<UserSalarySetting>(entity =>

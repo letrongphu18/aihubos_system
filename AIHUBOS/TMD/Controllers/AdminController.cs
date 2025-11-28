@@ -5,6 +5,7 @@ using AIHUBOS.Models;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.SignalR;
 using AIHUBOS.Hubs;
+using AIHUBOS.Services;
 
 namespace AIHUBOS.Controllers
 {
@@ -13,12 +14,14 @@ namespace AIHUBOS.Controllers
 		private readonly AihubSystemContext _context;
 		private readonly AuditHelper _auditHelper;
 		private readonly IHubContext<NotificationHub> _hubContext;
+		private readonly INotificationService _notificationService;
 
-		public AdminController(AihubSystemContext context, AuditHelper auditHelper, IHubContext<NotificationHub> hubContext)
+		public AdminController(AihubSystemContext context, AuditHelper auditHelper, IHubContext<NotificationHub> hubContext, INotificationService notificationService)
 		{
 			_context = context;
 			_auditHelper = auditHelper;
 			_hubContext = hubContext;
+			_notificationService = notificationService;
 
 		}
 		// Hàm helper để lấy setting và convert sang số (decimal)
@@ -39,31 +42,48 @@ namespace AIHUBOS.Controllers
 		// ============================================
 		// ADMIN DASHBOARD
 		// ============================================
+		// ============================================
+		// ADMIN DASHBOARD - ĐÃ ĐƯỢC TỐI ƯU HÓA
+		// ============================================
 		public async Task<IActionResult> Dashboard()
 		{
 			if (!IsAdmin())
 				return RedirectToAction("Login", "Account");
 
+			// ========== USER STATISTICS ==========
 			ViewBag.TotalUsers = await _context.Users.CountAsync();
 			ViewBag.ActiveUsers = await _context.Users.CountAsync(u => u.IsActive == true);
 			ViewBag.TotalDepartments = await _context.Departments.CountAsync();
 
+			// ========== TASK STATISTICS (DỰA VÀO STATUS) ==========
 			var allTasks = await _context.Tasks
 				.Include(t => t.UserTasks)
 				.Where(t => t.IsActive == true)
 				.ToListAsync();
 
+			var allUserTasks = allTasks.SelectMany(t => t.UserTasks).ToList();
+
 			ViewBag.TotalTasks = allTasks.Count;
-			ViewBag.CompletedTasks = allTasks.Count(t => t.UserTasks.Any() &&
-				t.UserTasks.All(ut => ut.CompletedThisWeek >= t.TargetPerWeek));
-			ViewBag.InProgressTasks = allTasks.Count - ViewBag.CompletedTasks;
-			ViewBag.OverdueTasks = allTasks.Count(t => t.Deadline.HasValue && t.Deadline.Value < DateTime.Now);
+			ViewBag.TotalAssignments = allUserTasks.Count;
 
-			var taskCompletionRate = ViewBag.TotalTasks > 0
-				? Math.Round((double)ViewBag.CompletedTasks / ViewBag.TotalTasks * 100, 1)
+			// Đếm theo Status
+			ViewBag.TodoTasks = allUserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO");
+			ViewBag.InProgressTasks = allUserTasks.Count(ut => ut.Status == "InProgress");
+			ViewBag.CompletedTasks = allUserTasks.Count(ut => ut.Status == "Completed");
+
+			// Task quá hạn (task chưa hoàn thành và deadline < now)
+			ViewBag.OverdueTasks = allTasks.Count(t =>
+				t.Deadline.HasValue &&
+				t.Deadline.Value < DateTime.Now &&
+				t.UserTasks.Any(ut => ut.Status != "Completed")
+			);
+
+			// Tỷ lệ hoàn thành (theo assignments)
+			ViewBag.TaskCompletionRate = allUserTasks.Count > 0
+				? Math.Round((double)ViewBag.CompletedTasks / allUserTasks.Count * 100, 1)
 				: 0;
-			ViewBag.TaskCompletionRate = taskCompletionRate;
 
+			// ========== ATTENDANCE STATISTICS (THÁNG HIỆN TẠI) ==========
 			var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 			var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
@@ -80,7 +100,7 @@ namespace AIHUBOS.Controllers
 				? Math.Round((double)ViewBag.OnTimeCount / monthlyAttendances.Count * 100, 1)
 				: 0;
 
-			// ✅ TOP PERFORMERS - FIX AVATAR
+			// ========== TOP PERFORMERS (THEO COMPLETED STATUS) ==========
 			var topPerformers = await _context.Users
 				.Include(u => u.Department)
 				.Include(u => u.UserTasks)
@@ -89,9 +109,8 @@ namespace AIHUBOS.Controllers
 				.Select(u => new
 				{
 					User = u,
-					TotalCompleted = u.UserTasks.Sum(ut => ut.CompletedThisWeek),
-					TaskCount = u.UserTasks.Count(ut => ut.Task.IsActive == true),
-					// ✅ THÊM AVATAR INFO
+					TotalCompleted = u.UserTasks.Count(ut => ut.Status == "Completed" && ut.Task.IsActive == true),
+					TotalTasks = u.UserTasks.Count(ut => ut.Task.IsActive == true),
 					Avatar = string.IsNullOrEmpty(u.Avatar) || u.Avatar == "/images/default-avatar.png" ? null : u.Avatar,
 					Initials = u.FullName != null ? u.FullName.Substring(0, 1).ToUpper() : "U",
 					HasAvatar = !string.IsNullOrEmpty(u.Avatar) && u.Avatar != "/images/default-avatar.png"
@@ -102,7 +121,7 @@ namespace AIHUBOS.Controllers
 
 			ViewBag.TopPerformers = topPerformers;
 
-			// ✅ LATE COMERS - FIX AVATAR
+			// ========== LATE COMERS ==========
 			var lateComers = await _context.Attendances
 				.Include(a => a.User)
 					.ThenInclude(u => u.Department)
@@ -115,7 +134,6 @@ namespace AIHUBOS.Controllers
 					UserId = g.Key,
 					User = g.First().User,
 					LateCount = g.Count(),
-					// ✅ THÊM AVATAR INFO
 					Avatar = string.IsNullOrEmpty(g.First().User.Avatar) || g.First().User.Avatar == "/images/default-avatar.png"
 						? null
 						: g.First().User.Avatar,
@@ -128,7 +146,7 @@ namespace AIHUBOS.Controllers
 
 			ViewBag.LateComers = lateComers;
 
-			// ✅ PUNCTUAL STAFF - FIX AVATAR
+			// ========== PUNCTUAL STAFF ==========
 			var punctualStaff = await _context.Attendances
 				.Include(a => a.User)
 					.ThenInclude(u => u.Department)
@@ -141,7 +159,6 @@ namespace AIHUBOS.Controllers
 					UserId = g.Key,
 					User = g.First().User,
 					OnTimeCount = g.Count(),
-					// ✅ THÊM AVATAR INFO
 					Avatar = string.IsNullOrEmpty(g.First().User.Avatar) || g.First().User.Avatar == "/images/default-avatar.png"
 						? null
 						: g.First().User.Avatar,
@@ -154,20 +171,23 @@ namespace AIHUBOS.Controllers
 
 			ViewBag.PunctualStaff = punctualStaff;
 
+			// ========== TASKS BY PRIORITY (THEO STATUS COMPLETED) ==========
 			var tasksByPriority = allTasks
 				.GroupBy(t => t.Priority ?? "Medium")
 				.Select(g => new
 				{
 					Priority = g.Key,
-					Total = g.Count(),
-					Completed = g.Count(t => t.UserTasks.Any() &&
-						t.UserTasks.All(ut => ut.CompletedThisWeek >= t.TargetPerWeek))
+					Total = g.Sum(t => t.UserTasks.Count),
+					Completed = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "Completed")),
+					InProgress = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "InProgress")),
+					Todo = g.Sum(t => t.UserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO"))
 				})
 				.OrderBy(x => x.Priority == "High" ? 1 : x.Priority == "Medium" ? 2 : 3)
 				.ToList();
 
 			ViewBag.TasksByPriority = tasksByPriority;
 
+			// ========== UPCOMING TASKS (THEO STATUS) ==========
 			var upcomingTasksData = await _context.Tasks
 				.Include(t => t.UserTasks)
 					.ThenInclude(ut => ut.User)
@@ -180,14 +200,43 @@ namespace AIHUBOS.Controllers
 			{
 				Task = t,
 				AssignedCount = t.UserTasks.Count,
-				CompletedCount = t.UserTasks.Count(ut => ut.CompletedThisWeek >= t.TargetPerWeek),
+				CompletedCount = t.UserTasks.Count(ut => ut.Status == "Completed"),
+				InProgressCount = t.UserTasks.Count(ut => ut.Status == "InProgress"),
+				TodoCount = t.UserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO"),
 				ProgressPercent = t.UserTasks.Count > 0
-					? Math.Round((double)t.UserTasks.Count(ut => ut.CompletedThisWeek >= t.TargetPerWeek) / t.UserTasks.Count * 100, 1)
+					? Math.Round((double)t.UserTasks.Count(ut => ut.Status == "Completed") / t.UserTasks.Count * 100, 1)
 					: 0
 			}).ToList();
 
 			ViewBag.UpcomingTasks = upcomingTasks;
 
+			// ========== TASK STATUS DISTRIBUTION (CHO CHART) ==========
+			ViewBag.TaskStatusData = new
+			{
+				Labels = new[] { "Chưa bắt đầu", "Đang làm", "Hoàn thành" },
+				Data = new[] { ViewBag.TodoTasks, ViewBag.InProgressTasks, ViewBag.CompletedTasks }
+			};
+
+			// ========== DEPARTMENT PERFORMANCE (CHO CHART) ==========
+			var deptPerformance = await _context.Departments
+				.Where(d => d.IsActive == true)
+				.Select(d => new
+				{
+					DepartmentName = d.DepartmentName,
+					TotalTasks = d.Users
+						.SelectMany(u => u.UserTasks)
+						.Count(ut => ut.Task.IsActive == true),
+					CompletedTasks = d.Users
+						.SelectMany(u => u.UserTasks)
+						.Count(ut => ut.Status == "Completed" && ut.Task.IsActive == true)
+				})
+				.Where(x => x.TotalTasks > 0)
+				.OrderByDescending(x => x.CompletedTasks)
+				.ToListAsync();
+
+			ViewBag.DepartmentPerformance = deptPerformance;
+
+			// ========== RECENT ACTIVITIES ==========
 			var recentAudits = await _context.AuditLogs
 				.Include(a => a.User)
 				.OrderByDescending(a => a.Timestamp)
@@ -1067,13 +1116,13 @@ namespace AIHUBOS.Controllers
 				);
 
 				// ✅ GỬI THÔNG BÁO CHO TẤT CẢ THÀNH VIÊN PHÒNG BAN
-				await _hubContext.Clients.Group($"Dept_{department.DepartmentId}").SendAsync(
-					"ReceiveMessage",
-					"Cập nhật phòng ban",
-					$"Phòng ban {department.DepartmentName} vừa được cập nhật thông tin",
-					"info",
-					$"/Admin/DepartmentDetail/{department.DepartmentId}"
-				);
+				await _notificationService.SendToDepartmentAsync(
+	department.DepartmentId,
+	"Cập nhật phòng ban",
+	$"Phòng ban {department.DepartmentName} vừa được cập nhật thông tin",
+	"info",
+	$"/Admin/DepartmentDetail/{department.DepartmentId}"
+);
 
 				return Json(new
 				{
@@ -1473,8 +1522,9 @@ namespace AIHUBOS.Controllers
 						_context.UserTasks.Add(userTask);
 
 						// ✅ GỬI THÔNG BÁO CHO TỪNG USER
-						await _hubContext.Clients.Group($"User_{userId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							userId,
 							"Nhiệm vụ mới",
 							$"Bạn vừa được giao task: {request.TaskName}",
 							"info",
@@ -1622,8 +1672,9 @@ namespace AIHUBOS.Controllers
 				foreach (var ut in toRemove)
 				{
 					// ✅ THÔNG BÁO CHO USER BỊ XÓA
-					await _hubContext.Clients.Group($"User_{ut.UserId}").SendAsync(
-						"ReceiveMessage",
+					// ✅ ĐÚNG
+					await _notificationService.SendToUserAsync(
+						ut.UserId,
 						"Task đã bị gỡ",
 						$"Bạn không còn được giao task: {task.TaskName}",
 						"warning",
@@ -1647,8 +1698,9 @@ namespace AIHUBOS.Controllers
 					_context.UserTasks.Add(userTask);
 
 					// ✅ THÔNG BÁO CHO USER MỚI
-					await _hubContext.Clients.Group($"User_{userId}").SendAsync(
-						"ReceiveMessage",
+					// ✅ ĐÚNG
+					await _notificationService.SendToUserAsync(
+						userId,
 						"Task mới được giao",
 						$"Bạn vừa được giao task: {request.TaskName}",
 						"info",
@@ -2363,8 +2415,9 @@ namespace AIHUBOS.Controllers
 						}
 
 						// GỬI THÔNG BÁO CHO USER
-						await _hubContext.Clients.Group($"User_{r.UserId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							r.UserId,
 							"Tăng ca được duyệt",
 							$"Yêu cầu tăng ca {r.OvertimeHours:F2}h ngày {r.WorkDate:dd/MM/yyyy} đã được phê duyệt",
 							"success",
@@ -2391,8 +2444,9 @@ namespace AIHUBOS.Controllers
 						}
 
 						// GỬI THÔNG BÁO CHO USER
-						await _hubContext.Clients.Group($"User_{r.UserId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							r.UserId,
 							"Tăng ca bị từ chối",
 							$"Yêu cầu tăng ca bị từ chối. Lý do: {model.Note}",
 							"error",
@@ -2476,8 +2530,9 @@ namespace AIHUBOS.Controllers
 						}
 
 						// GỬI THÔNG BÁO CHO USER
-						await _hubContext.Clients.Group($"User_{r.UserId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							r.UserId,
 							"Nghỉ phép được duyệt",
 							$"Yêu cầu nghỉ phép {r.TotalDays} ngày từ {r.StartDate:dd/MM/yyyy} đến {r.EndDate:dd/MM/yyyy} đã được duyệt",
 							"success",
@@ -2511,8 +2566,9 @@ namespace AIHUBOS.Controllers
 						}
 
 						// GỬI THÔNG BÁO CHO USER
-						await _hubContext.Clients.Group($"User_{r.UserId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							r.UserId,
 							"Nghỉ phép bị từ chối",
 							$"Yêu cầu nghỉ phép bị từ chối. Lý do: {model.Note}",
 							"error",
@@ -2589,8 +2645,9 @@ namespace AIHUBOS.Controllers
 						}
 
 						// GỬI THÔNG BÁO CHO USER
-						await _hubContext.Clients.Group($"User_{r.UserId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							r.UserId,
 							"Đi trễ được duyệt",
 							$"Yêu cầu đi trễ ngày {r.RequestDate:dd/MM/yyyy} đã được phê duyệt",
 							"success",
@@ -2615,8 +2672,9 @@ namespace AIHUBOS.Controllers
 						}
 
 						// GỬI THÔNG BÁO CHO USER
-						await _hubContext.Clients.Group($"User_{r.UserId}").SendAsync(
-							"ReceiveMessage",
+						// ✅ ĐÚNG
+						await _notificationService.SendToUserAsync(
+							r.UserId,
 							"Đi trễ bị từ chối",
 							$"Yêu cầu đi trễ bị từ chối. Lý do: {model.Note}",
 							"error",
@@ -2654,6 +2712,44 @@ namespace AIHUBOS.Controllers
 					$"Exception: {ex.Message}", new { Error = ex.ToString(), model });
 				return Json(new { success = false, message = $"Có lỗi: {ex.Message}" });
 			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetMyNotifications(int skip = 0, int take = 20)
+		{
+			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Not logged in" });
+
+			var notifications = await _notificationService.GetUserNotificationsAsync(userId.Value, skip, take);
+			var unreadCount = await _notificationService.GetUnreadCountAsync(userId.Value);
+
+			return Json(new
+			{
+				success = true,
+				notifications = notifications.Select(n => new {
+					id = n.UserNotificationId,
+					title = n.Notification.Title,
+					message = n.Notification.Message,
+					type = n.Notification.Type,
+					link = n.Notification.Link,
+					time = n.Notification.CreatedAt,
+					read = n.IsRead
+				}),
+				unreadCount
+			});
+		}
+		[HttpGet]
+		public async Task<IActionResult> TestNotification(int userId)
+		{
+			await _notificationService.SendToUserAsync(
+				userId,
+				"🔔 Test Notification",
+				"Đây là thông báo test từ hệ thống",
+				"info"
+			);
+
+			return Json(new { success = true, message = "Sent!" });
 		}
 		// ============================================
 		// THÊM VÀO AdminController.cs
@@ -2859,7 +2955,60 @@ namespace AIHUBOS.Controllers
 				return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
 			}
 		}
+		[HttpPost]
+		public async Task<IActionResult> MarkNotificationAsRead([FromBody] int userNotificationId)
+		{
+			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Not logged in" });
 
+			try
+			{
+				var userNotif = await _context.UserNotifications
+					.FirstOrDefaultAsync(un => un.UserNotificationId == userNotificationId && un.UserId == userId);
+
+				if (userNotif != null && !userNotif.IsRead)
+				{
+					userNotif.IsRead = true;
+					userNotif.ReadAt = DateTime.UtcNow;
+					await _context.SaveChangesAsync();
+				}
+
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = ex.Message });
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> MarkAllNotificationsAsRead()
+		{
+			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Not logged in" });
+
+			try
+			{
+				var unreadNotifs = await _context.UserNotifications
+					.Where(un => un.UserId == userId && !un.IsRead)
+					.ToListAsync();
+
+				foreach (var notif in unreadNotifs)
+				{
+					notif.IsRead = true;
+					notif.ReadAt = DateTime.UtcNow;
+				}
+
+				await _context.SaveChangesAsync();
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = ex.Message });
+			}
+		}
 		public class ReviewRequestViewModel
 		{
 			public string RequestType { get; set; } = string.Empty;

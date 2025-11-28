@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Linq;
 using Microsoft.AspNetCore.SignalR;
 using AIHUBOS.Hubs;
+using AIHUBOS.Services;
 
 namespace AIHUBOS.Controllers
 {
@@ -18,18 +19,45 @@ namespace AIHUBOS.Controllers
 		private readonly IWebHostEnvironment _env;
 		private readonly HttpClient _httpClient;
 		private readonly IHubContext<NotificationHub> _hubContext;
+		private readonly INotificationService _notificationService;
 
 
-		public StaffController(AihubSystemContext context, AuditHelper auditHelper, IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IHubContext<NotificationHub> hubContext)
+		public StaffController(AihubSystemContext context, AuditHelper auditHelper, IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IHubContext<NotificationHub> hubContext, INotificationService notificationService)
 		{
 			_context = context;
 			_auditHelper = auditHelper;
 			_env = env;
 			_httpClient = httpClientFactory.CreateClient();
 			_hubContext = hubContext;
+			_notificationService = notificationService;
+
 
 		}
+		[HttpGet]
+		public async Task<IActionResult> GetMyNotifications(int skip = 0, int take = 20)
+		{
+			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Not logged in" });
 
+			var notifications = await _notificationService.GetUserNotificationsAsync(userId.Value, skip, take);
+			var unreadCount = await _notificationService.GetUnreadCountAsync(userId.Value);
+
+			return Json(new
+			{
+				success = true,
+				notifications = notifications.Select(n => new {
+					id = n.UserNotificationId,
+					title = n.Notification.Title,
+					message = n.Notification.Message,
+					type = n.Notification.Type,
+					link = n.Notification.Link,
+					time = n.Notification.CreatedAt,
+					read = n.IsRead
+				}),
+				unreadCount
+			});
+		}
 		private bool IsAuthenticated()
 		{
 			return HttpContext.Session.GetInt32("UserId") != null;
@@ -589,8 +617,8 @@ namespace AIHUBOS.Controllers
 				// GỬI THÔNG BÁO CHO ADMIN KHI HOÀN THÀNH
 				if (request.Status == "Completed")
 				{
-					await _hubContext.Clients.Group("Admins").SendAsync(
-						"ReceiveMessage",
+					// ✅ ĐÚNG
+					await _notificationService.SendToAdminsAsync(
 						"Task hoàn thành",
 						$"{userTask.User.FullName} đã hoàn thành: {userTask.Task.TaskName}",
 						"success",
@@ -739,8 +767,8 @@ namespace AIHUBOS.Controllers
 				if (isLate)
 				{
 					var user = await _context.Users.FindAsync(userId);
-					await _hubContext.Clients.Group("Admins").SendAsync(
-						"ReceiveMessage",
+					// ✅ ĐÚNG
+					await _notificationService.SendToAdminsAsync(
 						"Nhân viên đi trễ",
 						$"{user?.FullName ?? "Nhân viên"} vừa check-in muộn lúc {serverNow:HH:mm:ss}",
 						"warning",
@@ -1346,8 +1374,8 @@ namespace AIHUBOS.Controllers
 				);
 
 				// GỬI THÔNG BÁO CHO ADMIN
-				await _hubContext.Clients.Group("Admins").SendAsync(
-					"ReceiveMessage",
+				// ✅ ĐÚNG
+				await _notificationService.SendToAdminsAsync(
 					"Yêu cầu tăng ca mới",
 					$"Nhân viên vừa gửi yêu cầu tăng ca {overtimeHours:F2}h cho ngày {workDateDo:dd/MM/yyyy}",
 					"info",
@@ -1459,8 +1487,8 @@ namespace AIHUBOS.Controllers
 				);
 
 				// GỬI THÔNG BÁO CHO ADMIN
-				await _hubContext.Clients.Group("Admins").SendAsync(
-					"ReceiveMessage",
+				// ✅ ĐÚNG
+				await _notificationService.SendToAdminsAsync(
 					"Yêu cầu nghỉ phép mới",
 					$"Nhân viên vừa gửi yêu cầu nghỉ phép {totalDays} ngày ({model.LeaveType})",
 					"info",
@@ -1527,8 +1555,8 @@ namespace AIHUBOS.Controllers
 				);
 
 				// GỬI THÔNG BÁO CHO ADMIN
-				await _hubContext.Clients.Group("Admins").SendAsync(
-					"ReceiveMessage",
+				// ✅ ĐÚNG
+				await _notificationService.SendToAdminsAsync(
 					"Yêu cầu đi trễ mới",
 					$"Nhân viên vừa gửi yêu cầu đi trễ cho ngày {late.RequestDate:dd/MM/yyyy}",
 					"info",
@@ -1992,6 +2020,62 @@ namespace AIHUBOS.Controllers
 					success = false,
 					message = $"Có lỗi xảy ra: {ex.Message}"
 				});
+			}
+		}
+
+
+		[HttpPost]
+		public async Task<IActionResult> MarkNotificationAsRead([FromBody] int userNotificationId)
+		{
+			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Not logged in" });
+
+			try
+			{
+				var userNotif = await _context.UserNotifications
+					.FirstOrDefaultAsync(un => un.UserNotificationId == userNotificationId && un.UserId == userId);
+
+				if (userNotif != null && !userNotif.IsRead)
+				{
+					userNotif.IsRead = true;
+					userNotif.ReadAt = DateTime.UtcNow;
+					await _context.SaveChangesAsync();
+				}
+
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = ex.Message });
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> MarkAllNotificationsAsRead()
+		{
+			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Not logged in" });
+
+			try
+			{
+				var unreadNotifs = await _context.UserNotifications
+					.Where(un => un.UserId == userId && !un.IsRead)
+					.ToListAsync();
+
+				foreach (var notif in unreadNotifs)
+				{
+					notif.IsRead = true;
+					notif.ReadAt = DateTime.UtcNow;
+				}
+
+				await _context.SaveChangesAsync();
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = ex.Message });
 			}
 		}
 		// ============================================

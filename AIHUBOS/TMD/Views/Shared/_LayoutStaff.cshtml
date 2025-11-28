@@ -123,49 +123,16 @@
             setTimeout(() => { document.querySelectorAll('.alert').forEach(a => new bootstrap.Alert(a).close()); }, 5000);
         });
 
-        // --- Theme Toggle ---
-        function toggleStaffTheme() {
-            const body = document.body;
-            const themeIcon = document.querySelector('#staffThemeToggle i');
-
-            body.classList.toggle('staff-dark-mode');
-
-            if (body.classList.contains('staff-dark-mode')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-                localStorage.setItem('staffTheme', 'dark');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-                localStorage.setItem('staffTheme', 'light');
-            }
-        }
-
-        // Load saved theme
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('staffTheme');
-            const themeIcon = document.querySelector('#staffThemeToggle i');
-
-            if (savedTheme === 'dark') {
-                document.body.classList.add('staff-dark-mode');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            }
-        });
-
         // --- ✅ SIGNALR NOTIFICATION LOGIC ---
         var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
-        var notifications = []; // Lưu trữ thông báo
+        var notifications = [];
 
         connection.on("ReceiveMessage", function (title, message, type, link) {
-            // 1. Play Sound
             var audio = document.getElementById("notifSound");
             if(audio) audio.play().catch(e => console.log("Cần tương tác để phát âm thanh"));
 
-            // 2. Show Toast
             showFloatingToast(title, message, type);
 
-            // 3. Lưu thông báo
             var notif = {
                 id: Date.now(),
                 title: title,
@@ -177,14 +144,36 @@
             };
             notifications.unshift(notif);
 
-            // 4. Cập nhật badge
             updateNotifBadge();
-
-            // 5. Render list
             renderNotifList();
         });
 
         connection.start().catch(err => console.error(err.toString()));
+
+        // ✅ LOAD NOTIFICATIONS FROM DATABASE
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/Staff/GetMyNotifications?skip=0&take=20');
+                const data = await response.json();
+
+                if (data.success) {
+                    notifications = data.notifications.map(n => ({
+                        id: n.id,
+                        title: n.title,
+                        message: n.message,
+                        type: n.type,
+                        link: n.link,
+                        time: new Date(n.time),
+                        read: n.read
+                    }));
+
+                    updateNotifBadge();
+                    renderNotifList();
+                }
+            } catch (e) {
+                console.error('Failed to load notifications:', e);
+            }
+        }
 
         function updateNotifBadge() {
             var unreadCount = notifications.filter(n => !n.read).length;
@@ -208,7 +197,9 @@
             notifications.slice(0, 20).forEach(function(notif) {
                 var timeStr = getTimeAgo(notif.time);
                 var readClass = notif.read ? 'read' : 'unread';
-                var linkAttr = notif.link ? `onclick="handleNotifClick(${notif.id}, '${notif.link}')"` : `onclick="markAsRead(${notif.id})"`;
+                var linkAttr = notif.link
+                    ? `onclick="handleNotifClick(${notif.id}, '${notif.link}')" style="cursor:pointer"`
+                    : `onclick="markAsRead(${notif.id})" style="cursor:pointer"`;
 
                 html += `
                     <div class="staff-notif-item staff-notif-item--${readClass}" ${linkAttr}>
@@ -228,19 +219,43 @@
             }
         }
 
-        function markAsRead(id) {
+        async function markAsRead(id) {
             var notif = notifications.find(n => n.id === id);
             if (notif && !notif.read) {
                 notif.read = true;
                 updateNotifBadge();
                 renderNotifList();
+
+                // ✅ LƯU VÀO DATABASE
+                try {
+                    await fetch('/Staff/MarkNotificationAsRead', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(id)
+                    });
+                } catch (e) {
+                    console.error('Failed to mark as read:', e);
+                }
             }
         }
 
-        function clearAllNotifications() {
+        async function clearAllNotifications() {
+            var hasUnread = notifications.some(n => !n.read);
+
             notifications.forEach(n => n.read = true);
             updateNotifBadge();
             renderNotifList();
+
+            // ✅ CHỈ GỌI API NẾU CÓ THÔNG BÁO CHƯA ĐỌC
+            if (hasUnread) {
+                try {
+                    await fetch('/Staff/MarkAllNotificationsAsRead', {
+                        method: 'POST'
+                    });
+                } catch (e) {
+                    console.error('Failed to mark all as read:', e);
+                }
+            }
         }
 
         function getTimeAgo(date) {
@@ -269,6 +284,40 @@
             container.appendChild(div);
             setTimeout(() => div.remove(), 5000);
         }
+
+        // --- Theme Toggle ---
+        function toggleStaffTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('#staffThemeToggle i');
+
+            body.classList.toggle('staff-dark-mode');
+
+            if (body.classList.contains('staff-dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('staffTheme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('staffTheme', 'light');
+            }
+        }
+
+        // ✅ LOAD KHI TRANG VỪA MỞ
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('staffTheme');
+            const themeIcon = document.querySelector('#staffThemeToggle i');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('staff-dark-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+
+            // Load notifications
+            loadNotifications();
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

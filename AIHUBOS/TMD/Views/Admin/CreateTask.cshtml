@@ -3,20 +3,20 @@
     ViewData["Title"] = "Tạo Task mới";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link href="~/css/tasklist-ad.css" rel="stylesheet" />
+<link href="~/css/task-create.css" rel="stylesheet" />
 
-<div class="container-fluid px-4 py-4 tm-container">
+<div class="aihub-tm-container">
     <!-- Header Section -->
-    <div class="tm-page-header">
-        <div class="d-flex justify-content-between align-items-center">
+    <div class="aihub-tm-page-header">
+        <div class="aihub-tm-d-flex aihub-tm-justify-between aihub-tm-align-center">
             <div>
-                <h1 class="tm-page-title">
-                    <i class="fas fa-plus-circle me-2"></i> Tạo Task mới
+                <h1 class="aihub-tm-page-title">
+                    <i class="fas fa-plus-circle"></i> Tạo Task mới
                 </h1>
-                <p class="tm-page-subtitle">Tạo và gán task cho nhân viên của bạn</p>
+                <p class="aihub-tm-page-subtitle">Tạo và gán task cho nhân viên của bạn</p>
             </div>
-            <a asp-action="TaskList" class="btn btn-secondary tm-btn-back">
-                <i class="fas fa-arrow-left me-2"></i> Quay lại
+            <a asp-action="TaskList" class="aihub-tm-btn-back">
+                <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
     </div>
@@ -24,36 +24,36 @@
     <div class="row">
         <!-- Main Form -->
         <div class="col-lg-8">
-            <div class="tm-card">
-                <div class="tm-card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-edit me-2"></i> Thông tin Task
+            <div class="aihub-tm-card">
+                <div class="aihub-tm-card-header">
+                    <h6>
+                        <i class="fas fa-edit"></i> Thông tin Task
                     </h6>
                 </div>
-                <div class="tm-card-body">
+                <div class="aihub-tm-card-body">
                     <form id="createTaskForm">
-                        <div class="tm-form-group">
-                            <label for="taskName" class="tm-form-label">
-                                Tên Task <span class="tm-text-danger">*</span>
+                        <div class="aihub-tm-form-group">
+                            <label for="taskName" class="aihub-tm-form-label">
+                                Tên Task <span class="aihub-tm-text-danger">*</span>
                             </label>
-                            <input type="text" class="form-control tm-form-control tm-form-control-lg" id="taskName"
+                            <input type="text" class="aihub-tm-form-control aihub-tm-form-control-lg" id="taskName"
                                    placeholder="Nhập tên task..." required>
-                            <small class="form-text tm-text-muted">
-                                <i class="fas fa-info-circle me-1"></i> Tên task phải rõ ràng và dễ hiểu
+                            <small class="aihub-tm-text-muted aihub-tm-mt-2" style="display: block;">
+                                <i class="fas fa-info-circle"></i> Tên task phải rõ ràng và dễ hiểu
                             </small>
                         </div>
 
-                        <div class="tm-form-group">
-                            <label for="description" class="tm-form-label">Mô tả</label>
-                            <textarea class="form-control tm-form-control" id="description" rows="4"
+                        <div class="aihub-tm-form-group">
+                            <label for="description" class="aihub-tm-form-label">Mô tả</label>
+                            <textarea class="aihub-tm-form-control" id="description" rows="4"
                                       placeholder="Mô tả chi tiết về task..."></textarea>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="tm-form-group">
-                                    <label for="platform" class="tm-form-label">Platform</label>
-                                    <select class="form-control tm-form-control" id="platform">
+                                <div class="aihub-tm-form-group">
+                                    <label for="platform" class="aihub-tm-form-label">Platform</label>
+                                    <select class="aihub-tm-form-control" id="platform">
                                         <option value="">-- Chọn Platform --</option>
                                         <option value="Facebook">📘 Facebook</option>
                                         <option value="Instagram">📷 Instagram</option>
@@ -69,52 +69,53 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="tm-form-group">
-                                    <label for="deadline" class="tm-form-label">Deadline</label>
-                                    <input type="datetime-local" class="form-control tm-form-control" id="deadline">
+                                <div class="aihub-tm-form-group">
+                                    <label for="deadline" class="aihub-tm-form-label">Deadline</label>
+                                    <input type="datetime-local" class="aihub-tm-form-control" id="deadline">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="tm-form-group">
-                            <label for="priority" class="tm-form-label">Priority</label>
-                            <select class="form-control tm-form-control" id="priority">
+                        <div class="aihub-tm-form-group">
+                            <label for="priority" class="aihub-tm-form-label">Priority</label>
+                            <select class="aihub-tm-form-control" id="priority">
                                 <option value="Low">🟢 Low - Ưu tiên thấp</option>
                                 <option value="Medium" selected>🟡 Medium - Ưu tiên trung bình</option>
                                 <option value="High">🔴 High - Ưu tiên cao</option>
                             </select>
                         </div>
 
-                        <div class="tm-divider"></div>
+                        <div class="aihub-tm-divider"></div>
 
-                        <div class="tm-form-group">
-                            <label class="tm-form-label">
-                                <i class="fas fa-users me-2"></i> Gán cho nhân viên
-                                <span class="tm-text-muted font-weight-normal">(Chọn nhiều)</span>
+                        <div class="aihub-tm-form-group">
+                            <label class="aihub-tm-form-label">
+                                <i class="fas fa-users"></i> Gán cho nhân viên
+                                <span class="aihub-tm-text-muted aihub-tm-font-weight-normal">(Chọn nhiều)</span>
                             </label>
-                            <div class="tm-card" style="border: 2px solid var(--tm-primary);">
-                                <div class="tm-card-body">
-                                    <div class="mb-3">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text tm-bg-gradient-primary tm-text-white">
+                            <div class="aihub-tm-card" style="border: 2px solid var(--aihub-terracotta);">
+                                <div class="aihub-tm-card-body">
+                                    <div class="aihub-tm-mb-3">
+                                        <div class="aihub-tm-input-group">
+                                            <div class="aihub-tm-input-group-prepend">
+                                                <span class="aihub-tm-input-group-text aihub-tm-bg-gradient-primary aihub-tm-text-white">
                                                     <i class="fas fa-search"></i>
                                                 </span>
                                             </div>
-                                            <input type="text" class="form-control tm-form-control" id="searchUsers"
+                                            <input type="text" class="aihub-tm-form-control" id="searchUsers"
                                                    placeholder="Tìm kiếm nhân viên theo tên hoặc phòng ban...">
                                         </div>
                                     </div>
 
-                                    <div class="custom-control custom-checkbox mb-3 pb-2 border-bottom">
-                                        <input type="checkbox" class="custom-control-input" id="selectAll">
-                                        <label class="custom-control-label font-weight-bold tm-text-primary" for="selectAll">
-                                            <i class="fas fa-check-double me-1"></i> Chọn tất cả
+                                    <div class="aihub-tm-checkbox-wrapper aihub-tm-mb-3" style="padding-bottom: 12px; border-bottom: 1px solid var(--aihub-border-color);">
+                                        <input type="checkbox" class="aihub-tm-checkbox" id="selectAll">
+                                        <span class="aihub-tm-checkmark"></span>
+                                        <label for="selectAll" class="aihub-tm-font-weight-bold aihub-tm-text-primary" style="padding-left: 12px;">
+                                            <i class="fas fa-check-double"></i> Chọn tất cả
                                         </label>
-                                        <span class="tm-badge tm-badge-info float-right" id="selectedCount">0</span>
+                                        <span class="aihub-tm-badge aihub-tm-badge-info" style="float: right;" id="selectedCount">0</span>
                                     </div>
 
-                                    <div class="tm-user-list" id="userList">
+                                    <div class="aihub-tm-user-list" id="userList">
                                         @if (ViewBag.Users != null)
                                         {
                                             var usersByDept = ((List<AIHUBOS.Models.User>)ViewBag.Users)
@@ -123,50 +124,47 @@
 
                                             foreach (var deptGroup in usersByDept)
                                             {
-                                                <div class="tm-dept-group">
-                                                    <div class="tm-dept-header">
-                                                        <h6 class="tm-dept-title">
-                                                            <i class="fas fa-building me-2"></i> @deptGroup.Key
-                                                            <span class="tm-badge tm-badge-info ms-2">@deptGroup.Count()</span>
+                                                <div class="aihub-tm-dept-group">
+                                                    <div class="aihub-tm-dept-header">
+                                                        <h6 class="aihub-tm-dept-title">
+                                                            <i class="fas fa-building"></i> @deptGroup.Key
+                                                            <span class="aihub-tm-badge aihub-tm-badge-info">@deptGroup.Count()</span>
                                                         </h6>
                                                     </div>
                                                     @foreach (var user in deptGroup.OrderBy(u => u.FullName))
                                                     {
-                                                        <div class="custom-control custom-checkbox ms-3 tm-user-item"
+                                                        <div class="aihub-tm-user-item"
                                                              data-name="@user.FullName.ToLower()"
                                                              data-dept="@(user.Department?.DepartmentName?.ToLower() ?? "")">
-                                                            <input type="checkbox" class="custom-control-input user-checkbox"
-                                                                   id="user_@user.UserId" value="@user.UserId">
-                                                            <label class="custom-control-label tm-user-label" for="user_@user.UserId">
-                                                                <div class="d-flex align-items-center">
-                                                                    @if (!string.IsNullOrEmpty(user.Avatar) && user.Avatar != "/images/default-avatar.png")
-                                                                    {
-                                                                        <!-- Avatar có ảnh -->
-                                                                        <img src="@user.Avatar"
-                                                                             class="rounded-circle me-2"
-                                                                             width="35"
-                                                                             height="35"
-                                                                             style="object-fit: cover;"
-                                                                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                                                        <div class="avatar-placeholder rounded-circle me-2"
-                                                                             style="display:none;width:35px;height:35px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;align-items:center;justify-content:center;font-weight:700;font-size:14px;">
-                                                                            @user.FullName.Substring(0, 1).ToUpper()
+                                                            <div class="aihub-tm-checkbox-wrapper">
+                                                                <input type="checkbox" class="aihub-tm-checkbox user-checkbox"
+                                                                       id="user_@user.UserId" value="@user.UserId">
+                                                                <span class="aihub-tm-checkmark"></span>
+                                                                <label class="aihub-tm-user-label" for="user_@user.UserId" style="padding-left: 12px;">
+                                                                    <div class="aihub-tm-d-flex aihub-tm-align-center aihub-tm-gap-2">
+                                                                        @if (!string.IsNullOrEmpty(user.Avatar) && user.Avatar != "/images/default-avatar.png")
+                                                                        {
+                                                                            <img src="@user.Avatar"
+                                                                                 class="aihub-tm-user-avatar"
+                                                                                 alt="@user.FullName"
+                                                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                                                            <div class="aihub-tm-user-avatar-placeholder" style="display:none;">
+                                                                                @user.FullName.Substring(0, 1).ToUpper()
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <div class="aihub-tm-user-avatar-placeholder">
+                                                                                @user.FullName.Substring(0, 1).ToUpper()
+                                                                            </div>
+                                                                        }
+                                                                        <div>
+                                                                            <strong style="display: block;">@user.FullName</strong>
+                                                                            <small class="aihub-tm-text-muted">@user.Username</small>
                                                                         </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <!-- Placeholder chữ cái đầu -->
-                                                                        <div class="rounded-circle me-2"
-                                                                             style="width:35px;height:35px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">
-                                                                            @user.FullName.Substring(0, 1).ToUpper()
-                                                                        </div>
-                                                                    }
-                                                                    <div>
-                                                                        <strong class="d-block">@user.FullName</strong>
-                                                                        <small class="tm-text-muted">@user.Username</small>
                                                                     </div>
-                                                                </div>
-                                                            </label>
+                                                                </label>
+                                                            </div>
                                                         </div>
                                                     }
                                                 </div>
@@ -177,13 +175,13 @@
                             </div>
                         </div>
 
-                        <div class="tm-divider"></div>
+                        <div class="aihub-tm-divider"></div>
 
-                        <div class="tm-alert tm-alert-info">
+                        <div class="aihub-tm-alert aihub-tm-alert-info">
                             <i class="fas fa-lightbulb fa-lg"></i>
                             <div>
                                 <strong>Lưu ý:</strong>
-                                <ul class="mb-0 mt-2">
+                                <ul class="aihub-tm-mt-2">
                                     <li>Tên task không được để trống</li>
                                     <li>Có thể gán task cho nhiều nhân viên cùng lúc</li>
                                     <li>Deadline và Platform có thể để trống</li>
@@ -191,12 +189,12 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a asp-action="TaskList" class="btn btn-secondary btn-lg">
-                                <i class="fas fa-times me-2"></i> Hủy
+                        <div class="aihub-tm-d-flex aihub-tm-justify-between aihub-tm-align-center aihub-tm-mt-4">
+                            <a asp-action="TaskList" class="aihub-tm-btn aihub-tm-btn-secondary aihub-tm-btn-lg">
+                                <i class="fas fa-times"></i> Hủy
                             </a>
-                            <button type="submit" class="btn btn-primary btn-lg tm-shadow" id="btnSubmit">
-                                <i class="fas fa-save me-2"></i> Tạo Task
+                            <button type="submit" class="aihub-tm-btn aihub-tm-btn-primary aihub-tm-btn-lg aihub-tm-shadow" id="btnSubmit">
+                                <i class="fas fa-save"></i> Tạo Task
                             </button>
                         </div>
                     </form>
@@ -207,52 +205,58 @@
         <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Preview Card -->
-            <div class="tm-card tm-sticky">
-                <div class="tm-card-header tm-bg-gradient-info tm-text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-eye me-2"></i> Xem trước
+            <div class="aihub-tm-card aihub-tm-sticky">
+                <div class="aihub-tm-card-header aihub-tm-bg-gradient-info aihub-tm-text-white">
+                    <h6>
+                        <i class="fas fa-eye"></i> Xem trước
                     </h6>
                 </div>
-                <div class="tm-card-body">
-                    <div class="tm-preview-section mb-3">
-                        <h5 id="previewTaskName" class="tm-text-muted font-weight-bold mb-2">
-                            <i class="fas fa-clipboard-list me-1"></i> Tên task...
+                <div class="aihub-tm-card-body">
+                    <div class="aihub-tm-preview-section aihub-tm-mb-3">
+                        <h5 id="previewTaskName" class="aihub-tm-text-muted aihub-tm-font-weight-bold">
+                            <i class="fas fa-clipboard-list"></i> Tên task...
                         </h5>
-                        <p id="previewDescription" class="tm-text-muted small mb-0">Mô tả...</p>
+                        <p id="previewDescription" class="aihub-tm-text-muted aihub-tm-small aihub-tm-mb-0">Mô tả...</p>
                     </div>
 
-                    <div class="tm-divider"></div>
+                    <div class="aihub-tm-divider"></div>
 
-                    <div class="tm-preview-item mb-3">
-                        <small class="tm-text-muted d-block mb-2">
-                            <i class="fas fa-globe me-1"></i> Platform
+                    <div class="aihub-tm-preview-item aihub-tm-mb-3">
+                        <small class="aihub-tm-text-muted">
+                            <i class="fas fa-globe"></i> Platform
                         </small>
-                        <span id="previewPlatform" class="tm-badge tm-badge-secondary">N/A</span>
+                        <div class="aihub-tm-mt-2">
+                            <span id="previewPlatform" class="aihub-tm-badge aihub-tm-badge-secondary">N/A</span>
+                        </div>
                     </div>
 
-                    <div class="tm-preview-item mb-3">
-                        <small class="tm-text-muted d-block mb-2">
-                            <i class="far fa-calendar-alt me-1"></i> Deadline
+                    <div class="aihub-tm-preview-item aihub-tm-mb-3">
+                        <small class="aihub-tm-text-muted">
+                            <i class="far fa-calendar-alt"></i> Deadline
                         </small>
-                        <span id="previewDeadline" class="tm-text-muted">Không có</span>
+                        <div class="aihub-tm-mt-2">
+                            <span id="previewDeadline" class="aihub-tm-text-muted">Không có</span>
+                        </div>
                     </div>
 
-                    <div class="tm-preview-item mb-3">
-                        <small class="tm-text-muted d-block mb-2">
-                            <i class="fas fa-flag me-1"></i> Priority
+                    <div class="aihub-tm-preview-item aihub-tm-mb-3">
+                        <small class="aihub-tm-text-muted">
+                            <i class="fas fa-flag"></i> Priority
                         </small>
-                        <span id="previewPriority" class="tm-badge tm-badge-warning">🟡 Medium</span>
+                        <div class="aihub-tm-mt-2">
+                            <span id="previewPriority" class="aihub-tm-badge aihub-tm-badge-warning">🟡 Medium</span>
+                        </div>
                     </div>
 
-                    <div class="tm-divider"></div>
+                    <div class="aihub-tm-divider"></div>
 
-                    <div class="tm-preview-item">
-                        <small class="tm-text-muted d-block mb-3">
-                            <i class="fas fa-users me-1"></i> Số người được gán
+                    <div class="aihub-tm-preview-item">
+                        <small class="aihub-tm-text-muted">
+                            <i class="fas fa-users"></i> Số người được gán
                         </small>
-                        <div class="text-center">
-                            <div class="display-4 font-weight-bold tm-text-primary mb-2" id="previewUserCount">0</div>
-                            <small class="tm-text-muted">nhân viên</small>
+                        <div class="aihub-tm-text-center aihub-tm-mt-2">
+                            <div class="aihub-tm-display-4 aihub-tm-font-weight-bold aihub-tm-text-primary" id="previewUserCount">0</div>
+                            <small class="aihub-tm-text-muted">nhân viên</small>
                         </div>
                     </div>
                 </div>
@@ -273,12 +277,12 @@
 
             function showToast(message, type = 'info') {
                 const toast = document.createElement('div');
-                toast.className = `tm-toast tm-toast-${type}`;
+                toast.className = `aihub-tm-toast aihub-tm-toast-${type}`;
                 toast.innerHTML = `
-                    <div class="tm-toast-content">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} tm-toast-icon"></i>
-                        <span class="tm-toast-message">${message}</span>
-                        <button class="tm-toast-close" onclick="this.parentElement.parentElement.remove()">
+                    <div class="aihub-tm-toast-content">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} aihub-tm-toast-icon"></i>
+                        <span class="aihub-tm-toast-message">${message}</span>
+                        <button class="aihub-tm-toast-close" onclick="this.parentElement.parentElement.remove()">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -297,7 +301,7 @@
                 document.getElementById('previewUserCount').textContent = count;
 
                 const visibleCheckboxes = Array.from(userCheckboxes).filter(cb =>
-                    cb.closest('.tm-user-item').style.display !== 'none'
+                    cb.closest('.aihub-tm-user-item').style.display !== 'none'
                 );
                 const checkedVisible = visibleCheckboxes.filter(cb => cb.checked);
                 selectAllCheckbox.checked = visibleCheckboxes.length > 0 &&
@@ -306,7 +310,7 @@
 
             selectAllCheckbox.addEventListener('change', function() {
                 userCheckboxes.forEach(cb => {
-                    if (cb.closest('.tm-user-item').style.display !== 'none') {
+                    if (cb.closest('.aihub-tm-user-item').style.display !== 'none') {
                         cb.checked = this.checked;
                     }
                 });
@@ -319,7 +323,7 @@
 
             searchInput.addEventListener('input', function() {
                 const searchText = this.value.toLowerCase().trim();
-                document.querySelectorAll('.tm-user-item').forEach(item => {
+                document.querySelectorAll('.aihub-tm-user-item').forEach(item => {
                     const name = item.dataset.name || '';
                     const dept = item.dataset.dept || '';
                     const matches = name.includes(searchText) || dept.includes(searchText);
@@ -331,26 +335,26 @@
             // Live Preview
             document.getElementById('taskName').addEventListener('input', function() {
                 const preview = document.getElementById('previewTaskName');
-                const icon = '<i class="fas fa-clipboard-list me-1"></i>';
+                const icon = '<i class="fas fa-clipboard-list"></i>';
                 if (this.value.trim()) {
                     preview.innerHTML = `${icon} ${this.value}`;
-                    preview.classList.remove('tm-text-muted');
-                    preview.classList.add('tm-text-dark');
+                    preview.classList.remove('aihub-tm-text-muted');
+                    preview.classList.add('aihub-tm-text-dark');
                 } else {
                     preview.innerHTML = `${icon} Tên task...`;
-                    preview.classList.add('tm-text-muted');
-                    preview.classList.remove('tm-text-dark');
+                    preview.classList.add('aihub-tm-text-muted');
+                    preview.classList.remove('aihub-tm-text-dark');
                 }
             });
 
             document.getElementById('description').addEventListener('input', function() {
                 const preview = document.getElementById('previewDescription');
                 preview.textContent = this.value.trim() || 'Mô tả...';
-                preview.classList.toggle('tm-text-muted', !this.value.trim());
+                preview.classList.toggle('aihub-tm-text-muted', !this.value.trim());
                 if (this.value.trim()) {
-                    preview.classList.add('tm-text-dark');
+                    preview.classList.add('aihub-tm-text-dark');
                 } else {
-                    preview.classList.remove('tm-text-dark');
+                    preview.classList.remove('aihub-tm-text-dark');
                 }
             });
 
@@ -360,10 +364,10 @@
                 if (value) {
                     const text = this.options[this.selectedIndex].text;
                     preview.textContent = text;
-                    preview.className = 'tm-badge tm-badge-info';
+                    preview.className = 'aihub-tm-badge aihub-tm-badge-info';
                 } else {
                     preview.textContent = 'N/A';
-                    preview.className = 'tm-badge tm-badge-secondary';
+                    preview.className = 'aihub-tm-badge aihub-tm-badge-secondary';
                 }
             });
 
@@ -378,23 +382,23 @@
                         hour: '2-digit',
                         minute: '2-digit'
                     });
-                    preview.classList.remove('tm-text-muted');
-                    preview.classList.add('tm-text-dark', 'font-weight-bold');
+                    preview.classList.remove('aihub-tm-text-muted');
+                    preview.classList.add('aihub-tm-text-dark', 'aihub-tm-font-weight-bold');
                 } else {
                     preview.textContent = 'Không có';
-                    preview.classList.add('tm-text-muted');
-                    preview.classList.remove('tm-text-dark', 'font-weight-bold');
+                    preview.classList.add('aihub-tm-text-muted');
+                    preview.classList.remove('aihub-tm-text-dark', 'aihub-tm-font-weight-bold');
                 }
             });
 
             document.getElementById('priority').addEventListener('change', function() {
                 const preview = document.getElementById('previewPriority');
                 const priority = this.value;
-                const badgeClass = priority === 'High' ? 'tm-badge-danger' :
-                                 priority === 'Medium' ? 'tm-badge-warning' : 'tm-badge-success';
+                const badgeClass = priority === 'High' ? 'aihub-tm-badge-danger' :
+                                 priority === 'Medium' ? 'aihub-tm-badge-warning' : 'aihub-tm-badge-success';
                 const icon = priority === 'High' ? '🔴' :
                            priority === 'Medium' ? '🟡' : '🟢';
-                preview.className = `tm-badge ${badgeClass}`;
+                preview.className = `aihub-tm-badge ${badgeClass}`;
                 preview.textContent = `${icon} ${priority}`;
             });
 
@@ -418,7 +422,7 @@
                 }
 
                 btnSubmit.disabled = true;
-                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang tạo...';
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
 
                 fetch('@Url.Action("CreateTaskPost", "Admin")', {
                     method: 'POST',
@@ -443,14 +447,14 @@
                     } else {
                         showToast(data.message || 'Có lỗi xảy ra!', 'danger');
                         btnSubmit.disabled = false;
-                        btnSubmit.innerHTML = '<i class="fas fa-save me-2"></i> Tạo Task';
+                        btnSubmit.innerHTML = '<i class="fas fa-save"></i> Tạo Task';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     showToast('Có lỗi xảy ra khi tạo task!', 'danger');
                     btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = '<i class="fas fa-save me-2"></i> Tạo Task';
+                    btnSubmit.innerHTML = '<i class="fas fa-save"></i> Tạo Task';
                 });
             });
         });

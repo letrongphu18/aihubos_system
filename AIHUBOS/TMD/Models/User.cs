@@ -86,8 +86,9 @@ public partial class User
     public virtual UserSalarySetting? UserSalarySettingUser { get; set; }
 
     public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
+	public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
-    public virtual ICollection<WorkScheduleException> WorkScheduleExceptionCreatedByNavigations { get; set; } = new List<WorkScheduleException>();
+	public virtual ICollection<WorkScheduleException> WorkScheduleExceptionCreatedByNavigations { get; set; } = new List<WorkScheduleException>();
 
     public virtual ICollection<WorkScheduleException> WorkScheduleExceptionUsers { get; set; } = new List<WorkScheduleException>();
 }

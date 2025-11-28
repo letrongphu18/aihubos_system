@@ -5,61 +5,60 @@
     var assignedUserIds = ViewBag.AssignedUserIds as List<int> ?? new List<int>();
 }
 <link href="~/css/edittask-ad.css" rel="stylesheet" />
-<link href="~/css/tasklist-ad.css" rel="stylesheet" />
 
-<div class="container-fluid px-4 py-4 tm-container">
+<div class="et-container">
     <!-- Header Section -->
-    <div class="tm-page-header">
-        <div class="d-flex justify-content-between align-items-center">
+    <div class="et-page-header">
+        <div class="et-d-flex et-justify-between et-align-center">
             <div>
-                <h1 class="tm-page-title">
-                    <i class="fas fa-edit me-2"></i> Chỉnh sửa Task
+                <h1 class="et-page-title">
+                    <i class="fas fa-edit"></i> Chỉnh sửa Task
                 </h1>
-                <p class="tm-page-subtitle">Cập nhật thông tin task #@Model.TaskId</p>
+                <p class="et-page-subtitle">Cập nhật thông tin task #@Model.TaskId</p>
             </div>
-            <a asp-action="TaskList" class="btn btn-secondary tm-btn-back">
-                <i class="fas fa-arrow-left me-2"></i> Quay lại
+            <a asp-action="TaskList" class="et-btn-back">
+                <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
     </div>
 
-    <div class="row">
+    <div class="et-row">
         <!-- Main Form -->
-        <div class="col-lg-8">
-            <div class="tm-card">
-                <div class="tm-card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0">
-                            <i class="fas fa-edit me-2"></i> Thông tin Task
+        <div class="et-col-lg-8">
+            <div class="et-card">
+                <div class="et-card-header">
+                    <div class="et-d-flex et-justify-between et-align-center">
+                        <h6 class="et-mb-0">
+                            <i class="fas fa-edit"></i> Thông tin Task
                         </h6>
-                        <span class="tm-badge @(Model.IsActive == true ? "tm-badge-success" : "tm-badge-secondary")">
-                            <i class="fas fa-@(Model.IsActive == true ? "check" : "pause")-circle me-1"></i>
+                        <span class="et-badge @(Model.IsActive == true ? "et-badge-success" : "et-badge-secondary")">
+                            <i class="fas fa-@(Model.IsActive == true ? "check" : "pause")-circle"></i>
                             @(Model.IsActive == true ? "Active" : "Inactive")
                         </span>
                     </div>
                 </div>
-                <div class="tm-card-body">
+                <div class="et-card-body">
                     <form id="updateTaskForm">
                         <input type="hidden" id="taskId" value="@Model.TaskId">
 
-                        <div class="tm-form-group">
-                            <label for="taskName" class="tm-form-label">
-                                Tên Task <span class="tm-text-danger">*</span>
+                        <div class="et-form-group">
+                            <label for="taskName" class="et-form-label">
+                                Tên Task <span class="et-text-danger">*</span>
                             </label>
-                            <input type="text" class="form-control tm-form-control tm-form-control-lg" id="taskName"
+                            <input type="text" class="et-form-control et-form-control-lg" id="taskName"
                                    value="@Model.TaskName" required>
                         </div>
 
-                        <div class="tm-form-group">
-                            <label for="description" class="tm-form-label">Mô tả</label>
-                            <textarea class="form-control tm-form-control" id="description" rows="4">@Model.Description</textarea>
+                        <div class="et-form-group">
+                            <label for="description" class="et-form-label">Mô tả</label>
+                            <textarea class="et-form-control" id="description" rows="4">@Model.Description</textarea>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="tm-form-group">
-                                    <label for="platform" class="tm-form-label">Platform</label>
-                                    <select class="form-control tm-form-control" id="platform">
+                        <div class="et-row">
+                            <div class="et-col-md-6">
+                                <div class="et-form-group">
+                                    <label for="platform" class="et-form-label">Platform</label>
+                                    <select class="et-form-control" id="platform">
                                         <option value="">-- Chọn Platform --</option>
                                         <option value="Facebook">📘 Facebook</option>
                                         <option value="Instagram">📷 Instagram</option>
@@ -74,54 +73,54 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="tm-form-group">
-                                    <label for="deadline" class="tm-form-label">Deadline</label>
-                                    <input type="datetime-local" class="form-control tm-form-control" id="deadline"
+                            <div class="et-col-md-6">
+                                <div class="et-form-group">
+                                    <label for="deadline" class="et-form-label">Deadline</label>
+                                    <input type="datetime-local" class="et-form-control" id="deadline"
                                            value="@(Model.Deadline?.ToString("yyyy-MM-ddTHH:mm"))">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="tm-form-group">
-                            <label for="priority" class="tm-form-label">Priority</label>
-                            <select class="form-control tm-form-control" id="priority">
+                        <div class="et-form-group">
+                            <label for="priority" class="et-form-label">Priority</label>
+                            <select class="et-form-control" id="priority">
                                 <option value="Low">🟢 Low - Ưu tiên thấp</option>
                                 <option value="Medium">🟡 Medium - Ưu tiên trung bình</option>
                                 <option value="High">🔴 High - Ưu tiên cao</option>
                             </select>
                         </div>
 
-                        <div class="tm-divider"></div>
+                        <div class="et-divider"></div>
 
-                        <div class="tm-form-group">
-                            <label class="tm-form-label">
-                                <i class="fas fa-users me-2"></i> Gán cho nhân viên
-                                <span class="tm-text-muted font-weight-normal">(Chọn nhiều)</span>
+                        <div class="et-form-group">
+                            <label class="et-form-label">
+                                <i class="fas fa-users"></i> Gán cho nhân viên
+                                <span class="et-text-muted">(Chọn nhiều)</span>
                             </label>
-                            <div class="tm-card" style="border: 2px solid var(--tm-primary);">
-                                <div class="tm-card-body">
-                                    <div class="mb-3">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text tm-bg-gradient-primary tm-text-white">
-                                                    <i class="fas fa-search"></i>
-                                                </span>
+                            <div class="et-card et-user-selection-card">
+                                <div class="et-card-body">
+                                    <div class="et-search-wrapper">
+                                        <div class="et-input-group">
+                                            <div class="et-input-group-prepend">
+                                                <i class="fas fa-search"></i>
                                             </div>
-                                            <input type="text" class="form-control tm-form-control" id="searchUsers"
+                                            <input type="text" class="et-form-control" id="searchUsers"
                                                    placeholder="Tìm kiếm nhân viên theo tên hoặc phòng ban...">
                                         </div>
                                     </div>
 
-                                    <div class="custom-control custom-checkbox mb-3 pb-2 border-bottom">
-                                        <input type="checkbox" class="custom-control-input" id="selectAll">
-                                        <label class="custom-control-label font-weight-bold tm-text-primary" for="selectAll">
-                                            <i class="fas fa-check-double me-1"></i> Chọn tất cả
+                                    <div class="et-checkbox-wrapper">
+                                        <label class="et-checkbox">
+                                            <input type="checkbox" id="selectAll">
+                                            <span class="et-checkbox-label">
+                                                <i class="fas fa-check-double"></i> Chọn tất cả
+                                            </span>
+                                            <span class="et-badge et-badge-info et-float-right" id="selectedCount">0</span>
                                         </label>
-                                        <span class="tm-badge tm-badge-info float-right" id="selectedCount">0</span>
                                     </div>
 
-                                    <div class="tm-user-list" id="userList">
+                                    <div class="et-user-list" id="userList">
                                         @if (ViewBag.Users != null)
                                         {
                                             var usersByDept = ((List<AIHUBOS.Models.User>)ViewBag.Users)
@@ -130,49 +129,46 @@
 
                                             foreach (var deptGroup in usersByDept)
                                             {
-                                                <div class="tm-dept-group">
-                                                    <div class="tm-dept-header">
-                                                        <h6 class="tm-dept-title">
-                                                            <i class="fas fa-building me-2"></i> @deptGroup.Key
-                                                            <span class="tm-badge tm-badge-info ms-2">@deptGroup.Count()</span>
+                                                <div class="et-dept-group">
+                                                    <div class="et-dept-header">
+                                                        <h6 class="et-dept-title">
+                                                            <i class="fas fa-building"></i> @deptGroup.Key
+                                                            <span class="et-badge et-badge-info et-ms-2">@deptGroup.Count()</span>
                                                         </h6>
                                                     </div>
                                                     @foreach (var user in deptGroup.OrderBy(u => u.FullName))
                                                     {
                                                         var isChecked = assignedUserIds.Contains(user.UserId);
-                                                        <div class="custom-control custom-checkbox ms-3 tm-user-item"
+                                                        <div class="et-user-item"
                                                              data-name="@user.FullName.ToLower()"
                                                              data-dept="@(user.Department?.DepartmentName?.ToLower() ?? "")">
-                                                            <input type="checkbox" class="custom-control-input user-checkbox"
+                                                            <input type="checkbox" class="user-checkbox"
                                                                    id="user_@user.UserId" value="@user.UserId"
-                                                            @(isChecked ? "checked" : "")>
-                                                            <label class="custom-control-label tm-user-label" for="user_@user.UserId">
-                                                                <div class="d-flex align-items-center">
+                                                            @(isChecked ? "checked" : "")
+                                                                   style="display: none;">
+                                                            <label class="et-user-label" for="user_@user.UserId">
+                                                                <div class="et-d-flex et-align-center et-gap-3">
                                                                     @if (!string.IsNullOrEmpty(user.Avatar) && user.Avatar != "/images/default-avatar.png")
                                                                     {
-                                                                        <!-- Avatar có ảnh -->
                                                                         <img src="@user.Avatar"
-                                                                             class="rounded-circle me-2"
-                                                                             width="35"
-                                                                             height="35"
+                                                                             class="et-user-avatar"
                                                                              style="object-fit: cover;"
                                                                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                                                        <div class="avatar-placeholder rounded-circle me-2"
-                                                                             style="display:none;width:35px;height:35px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;align-items:center;justify-content:center;font-weight:700;font-size:14px;">
+                                                                        <div class="et-user-avatar"
+                                                                             style="display:none;background:linear-gradient(135deg,#667eea,#764ba2);color:white;align-items:center;justify-content:center;font-weight:700;font-size:14px;">
                                                                             @user.FullName.Substring(0, 1).ToUpper()
                                                                         </div>
                                                                     }
                                                                     else
                                                                     {
-                                                                        <!-- Placeholder chữ cái đầu -->
-                                                                        <div class="rounded-circle me-2"
-                                                                             style="width:35px;height:35px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">
+                                                                        <div class="et-user-avatar"
+                                                                             style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">
                                                                             @user.FullName.Substring(0, 1).ToUpper()
                                                                         </div>
                                                                     }
-                                                                    <div>
-                                                                        <strong class="d-block">@user.FullName</strong>
-                                                                        <small class="tm-text-muted">@user.Username</small>
+                                                                    <div class="et-user-info-inline">
+                                                                        <strong>@user.FullName</strong>
+                                                                        <small class="et-text-muted">@user.Username</small>
                                                                     </div>
                                                                 </div>
                                                             </label>
@@ -186,25 +182,25 @@
                             </div>
                         </div>
 
-                        <div class="tm-divider"></div>
+                        <div class="et-divider"></div>
 
-                        <div class="tm-alert tm-alert-info">
-                            <i class="fas fa-info-circle fa-lg"></i>
+                        <div class="et-alert et-alert-info">
+                            <i class="fas fa-info-circle"></i>
                             <div>
                                 <strong>Thông tin:</strong>
-                                <ul class="mb-0 mt-2">
+                                <ul class="et-mb-0">
                                     <li>Task được tạo: <strong>@Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</strong></li>
                                     <li>Cập nhật lần cuối: <strong>@Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm")</strong></li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a asp-action="TaskList" class="btn btn-secondary btn-lg">
-                                <i class="fas fa-times me-2"></i> Hủy
+                        <div class="et-d-flex et-justify-between et-align-center et-mt-4">
+                            <a asp-action="TaskList" class="et-btn et-btn-secondary et-btn-lg">
+                                <i class="fas fa-times"></i> Hủy
                             </a>
-                            <button type="submit" class="btn btn-primary btn-lg tm-shadow" id="btnSubmit">
-                                <i class="fas fa-save me-2"></i> Cập nhật Task
+                            <button type="submit" class="et-btn et-btn-primary et-btn-lg" id="btnSubmit">
+                                <i class="fas fa-save"></i> Cập nhật Task
                             </button>
                         </div>
                     </form>
@@ -213,42 +209,42 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
+        <div class="et-col-lg-4">
             <!-- Current Assignments -->
-            <div class="tm-card">
-                <div class="tm-card-header tm-bg-gradient-success tm-text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-users me-2"></i> Hiện đang gán (@Model.UserTasks.Count)
+            <div class="et-card">
+                <div class="et-card-header et-sidebar-card-header">
+                    <h6 class="et-mb-0">
+                        <i class="fas fa-users"></i> Hiện đang gán (@Model.UserTasks.Count)
                     </h6>
                 </div>
-                <div class="tm-card-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="et-card-body" style="max-height: 400px; overflow-y: auto;">
                     @if (Model.UserTasks.Any())
                     {
                         foreach (var ut in Model.UserTasks.OrderBy(ut => ut.User.FullName))
                         {
-                            <div class="tm-user-card mb-3">
+                            <div class="et-user-card et-mb-3">
                                 @if (!string.IsNullOrEmpty(ut.User.Avatar) && ut.User.Avatar != "/images/default-avatar.png")
                                 {
                                     <img src="@ut.User.Avatar"
-                                         class="tm-user-avatar"
-                                         style="object-fit: cover; width: 50px; height: 50px;"
-                                         onerror="this.style.display='none';this.parentElement.querySelector('.avatar-placeholder-sidebar').style.display='flex'">
-                                    <div class="avatar-placeholder-sidebar rounded-circle"
-                                         style="display:none;width:50px;height:50px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;">
+                                         class="et-user-card-avatar"
+                                         style="object-fit: cover;"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="et-user-card-avatar"
+                                         style="display:none;background:linear-gradient(135deg,#667eea,#764ba2);color:white;align-items:center;justify-content:center;font-weight:700;font-size:18px;">
                                         @ut.User.FullName.Substring(0, 1).ToUpper()
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="rounded-circle"
-                                         style="width:50px;height:50px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;margin-right:12px;">
+                                    <div class="et-user-card-avatar"
+                                         style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;">
                                         @ut.User.FullName.Substring(0, 1).ToUpper()
                                     </div>
                                 }
-                                <div class="tm-user-info">
-                                    <div class="tm-user-name">@ut.User.FullName</div>
-                                    <div class="tm-user-department">
-                                        <i class="fas fa-building me-1"></i> @(ut.User.Department?.DepartmentName ?? "N/A")
+                                <div class="et-user-info">
+                                    <div class="et-user-name">@ut.User.FullName</div>
+                                    <div class="et-user-department">
+                                        <i class="fas fa-building"></i> @(ut.User.Department?.DepartmentName ?? "N/A")
                                     </div>
                                 </div>
                             </div>
@@ -256,7 +252,7 @@
                     }
                     else
                     {
-                        <div class="tm-empty-state">
+                        <div class="et-empty-state">
                             <i class="fas fa-users fa-3x"></i>
                             <p>Chưa có ai được gán</p>
                         </div>
@@ -265,18 +261,18 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="tm-card mt-4">
-                <div class="tm-card-header tm-bg-gradient-info tm-text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-chart-bar me-2"></i> Thống kê
+            <div class="et-card et-mt-4">
+                <div class="et-card-header et-stats-card-header">
+                    <h6 class="et-mb-0">
+                        <i class="fas fa-chart-bar"></i> Thống kê
                     </h6>
                 </div>
-                <div class="tm-card-body">
-                    <div class="tm-stat-item mb-3">
-                        <small class="tm-text-muted d-block mb-2">
+                <div class="et-card-body">
+                    <div class="et-stat-item et-mb-3">
+                        <small>
                             <i class="fas fa-users"></i> Tổng số người gán
                         </small>
-                        <h3 class="mb-0 tm-text-primary font-weight-bold">
+                        <h3>
                             @Model.UserTasks.Count <span class="small">người</span>
                         </h3>
                     </div>
@@ -285,20 +281,20 @@
                     {
                         var daysLeft = (Model.Deadline.Value - DateTime.Now).Days;
                         var hoursLeft = (Model.Deadline.Value - DateTime.Now).Hours;
-                        var alertClass = daysLeft < 0 ? "tm-alert-danger" : daysLeft < 7 ? "tm-alert-warning" : "tm-alert-info";
+                        var alertClass = daysLeft < 0 ? "et-alert-danger" : daysLeft < 7 ? "et-alert-warning" : "et-alert-info";
                         var iconClass = daysLeft < 0 ? "fa-exclamation-triangle" : "fa-clock";
 
-                        <div class="tm-divider"></div>
+                        <div class="et-divider"></div>
 
-                        <div class="tm-stat-item">
-                            <small class="tm-text-muted d-block mb-2">
+                        <div class="et-stat-item">
+                            <small>
                                 <i class="far fa-calendar-alt"></i> Thời hạn
                             </small>
-                            <div class="tm-alert @alertClass mb-0">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas @iconClass fa-2x me-3"></i>
-                                    <div>
-                                        <strong class="d-block">
+                            <div class="et-alert @alertClass et-mb-0">
+                                <div class="et-d-flex et-align-center">
+                                    <i class="fas @iconClass" style="font-size: 32px;"></i>
+                                    <div style="margin-left: 12px;">
+                                        <strong style="display: block;">
                                             @if (daysLeft < 0)
                                             {
                                                 <span>Quá hạn @Math.Abs(daysLeft) ngày</span>
@@ -306,14 +302,14 @@
                                             else if (daysLeft == 0)
                                             {
                                                 <span>Hết hạn hôm nay</span>
-                                                <small class="d-block">(@hoursLeft giờ nữa)</small>
+                                                <small style="display: block;">(@hoursLeft giờ nữa)</small>
                                             }
                                             else
                                             {
                                                 <span>Còn @daysLeft ngày</span>
                                             }
                                         </strong>
-                                        <small class="d-block mt-1">
+                                        <small style="display: block; margin-top: 4px;">
                                             @Model.Deadline.Value.ToString("dd/MM/yyyy HH:mm")
                                         </small>
                                     </div>
@@ -342,12 +338,12 @@
 
             function showToast(message, type = 'info') {
                 const toast = document.createElement('div');
-                toast.className = `tm-toast tm-toast-${type}`;
+                toast.className = `et-toast et-toast-${type}`;
                 toast.innerHTML = `
-                    <div class="tm-toast-content">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} tm-toast-icon"></i>
-                        <span class="tm-toast-message">${message}</span>
-                        <button class="tm-toast-close" onclick="this.parentElement.parentElement.remove()">
+                    <div class="et-toast-content">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} et-toast-icon"></i>
+                        <span class="et-toast-message">${message}</span>
+                        <button class="et-toast-close" onclick="this.parentElement.parentElement.remove()">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -367,7 +363,7 @@
 
             function updateSelectAllCheckbox() {
                 const visibleCheckboxes = Array.from(userCheckboxes).filter(cb =>
-                    cb.closest('.tm-user-item').style.display !== 'none'
+                    cb.closest('.et-user-item').style.display !== 'none'
                 );
                 const checkedVisible = visibleCheckboxes.filter(cb => cb.checked);
                 selectAllCheckbox.checked = visibleCheckboxes.length > 0 &&
@@ -379,7 +375,7 @@
 
             selectAllCheckbox.addEventListener('change', function() {
                 userCheckboxes.forEach(cb => {
-                    if (cb.closest('.tm-user-item').style.display !== 'none') {
+                    if (cb.closest('.et-user-item').style.display !== 'none') {
                         cb.checked = this.checked;
                     }
                 });
@@ -395,7 +391,7 @@
 
             searchInput.addEventListener('input', function() {
                 const searchText = this.value.toLowerCase().trim();
-                document.querySelectorAll('.tm-user-item').forEach(item => {
+                document.querySelectorAll('.et-user-item').forEach(item => {
                     const name = item.dataset.name || '';
                     const dept = item.dataset.dept || '';
                     const matches = name.includes(searchText) || dept.includes(searchText);
@@ -424,7 +420,7 @@
                 }
 
                 btnSubmit.disabled = true;
-                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang cập nhật...';
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang cập nhật...';
 
                 fetch('@Url.Action("UpdateTask", "Admin")', {
                     method: 'POST',
@@ -450,14 +446,14 @@
                     } else {
                         showToast(data.message || 'Có lỗi xảy ra!', 'danger');
                         btnSubmit.disabled = false;
-                        btnSubmit.innerHTML = '<i class="fas fa-save me-2"></i> Cập nhật Task';
+                        btnSubmit.innerHTML = '<i class="fas fa-save"></i> Cập nhật Task';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     showToast('Có lỗi xảy ra khi cập nhật task!', 'danger');
                     btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = '<i class="fas fa-save me-2"></i> Cập nhật Task';
+                    btnSubmit.innerHTML = '<i class="fas fa-save"></i> Cập nhật Task';
                 });
             });
         });

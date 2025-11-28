@@ -6,45 +6,45 @@
 
 <link href="~/css/pending-requests.css" rel="stylesheet" />
 
-<div class="container-fluid">
+<div class="pr-page-container">
     <!-- PAGE HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
-        <div>
-            <h2><i class="fas fa-clipboard-check me-2"></i>Duyệt Đề Xuất</h2>
-            <p class="text-muted">Xem và phê duyệt các đề xuất từ nhân viên</p>
+    <div class="pr-page-header">
+        <div class="pr-page-header-content">
+            <h2><i class="fas fa-clipboard-check"></i>Duyệt Đề Xuất</h2>
+            <p>Xem và phê duyệt các đề xuất từ nhân viên</p>
         </div>
         <div>
-            <button class="btn btn-outline-primary" onclick="refreshData()">
-                <i class="fas fa-sync-alt me-1"></i> Làm mới
+            <button class="pr-refresh-btn" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Làm mới
             </button>
         </div>
     </div>
 
     <!-- STATISTICS -->
-    <div class="stats-row">
-        <div class="stat-card stat-pending">
-            <div class="stat-card-icon">
+    <div class="pr-stats-row">
+        <div class="pr-stat-card pr-stat-pending">
+            <div class="pr-stat-card-icon">
                 <i class="fas fa-hourglass-half"></i>
             </div>
-            <div class="stat-card-content">
+            <div class="pr-stat-card-content">
                 <h3 id="totalPending">0</h3>
                 <p>Chờ duyệt</p>
             </div>
         </div>
-        <div class="stat-card stat-approved">
-            <div class="stat-card-icon">
+        <div class="pr-stat-card pr-stat-approved">
+            <div class="pr-stat-card-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <div class="stat-card-content">
+            <div class="pr-stat-card-content">
                 <h3 id="totalApproved">0</h3>
                 <p>Đã duyệt</p>
             </div>
         </div>
-        <div class="stat-card stat-rejected">
-            <div class="stat-card-icon">
+        <div class="pr-stat-card pr-stat-rejected">
+            <div class="pr-stat-card-icon">
                 <i class="fas fa-times-circle"></i>
             </div>
-            <div class="stat-card-content">
+            <div class="pr-stat-card-content">
                 <h3 id="totalRejected">0</h3>
                 <p>Từ chối</p>
             </div>
@@ -52,28 +52,28 @@
     </div>
 
     <!-- FILTERS CARD -->
-    <div class="filters-card">
+    <div class="pr-filters-card">
         <!-- Quick Filters -->
-        <div class="quick-filters">
-            <button class="quick-filter active" data-status="">
-                <i class="fas fa-list me-1"></i> Tất cả
+        <div class="pr-quick-filters">
+            <button class="pr-quick-filter active" data-status="">
+                <i class="fas fa-list"></i> Tất cả
             </button>
-            <button class="quick-filter" data-status="Pending">
-                <i class="fas fa-clock me-1"></i> Chờ duyệt
+            <button class="pr-quick-filter" data-status="Pending">
+                <i class="fas fa-clock"></i> Chờ duyệt
             </button>
-            <button class="quick-filter" data-status="Approved">
-                <i class="fas fa-check me-1"></i> Đã duyệt
+            <button class="pr-quick-filter" data-status="Approved">
+                <i class="fas fa-check"></i> Đã duyệt
             </button>
-            <button class="quick-filter" data-status="Rejected">
-                <i class="fas fa-times me-1"></i> Từ chối
+            <button class="pr-quick-filter" data-status="Rejected">
+                <i class="fas fa-times"></i> Từ chối
             </button>
         </div>
 
         <!-- Detailed Filters -->
-        <div class="detailed-filters">
+        <div class="pr-detailed-filters">
             <div>
-                <label class="form-label">Loại đề xuất</label>
-                <select id="filterType" class="form-select">
+                <label class="pr-form-label">Loại đề xuất</label>
+                <select id="filterType" class="pr-form-select">
                     <option value="">Tất cả loại</option>
                     <option value="Overtime">Tăng ca</option>
                     <option value="Leave">Nghỉ phép</option>
@@ -82,8 +82,8 @@
             </div>
 
             <div>
-                <label class="form-label">Trạng thái</label>
-                <select id="filterStatus" class="form-select">
+                <label class="pr-form-label">Trạng thái</label>
+                <select id="filterStatus" class="pr-form-select">
                     <option value="">Tất cả trạng thái</option>
                     <option value="Pending">Chờ duyệt</option>
                     <option value="Approved">Đã duyệt</option>
@@ -92,60 +92,60 @@
             </div>
 
             <div>
-                <label class="form-label">Từ ngày</label>
-                <input type="date" id="filterFrom" class="form-control">
+                <label class="pr-form-label">Từ ngày</label>
+                <input type="date" id="filterFrom" class="pr-form-control">
             </div>
 
             <div>
-                <label class="form-label">Đến ngày</label>
-                <input type="date" id="filterTo" class="form-control">
+                <label class="pr-form-label">Đến ngày</label>
+                <input type="date" id="filterTo" class="pr-form-control">
             </div>
 
             <div>
-                <label class="form-label">Tìm kiếm</label>
-                <input type="text" id="filterKeyword" class="form-control" placeholder="Nhân viên, lý do...">
+                <label class="pr-form-label">Tìm kiếm</label>
+                <input type="text" id="filterKeyword" class="pr-form-control" placeholder="Nhân viên, lý do...">
             </div>
 
             <div>
-                <label class="form-label">&nbsp;</label>
-                <button class="btn btn-primary w-100" id="applyFiltersBtn">
-                    <i class="fas fa-filter me-1"></i> Lọc
+                <label class="pr-form-label">&nbsp;</label>
+                <button class="pr-btn pr-btn-primary" id="applyFiltersBtn">
+                    <i class="fas fa-filter"></i> Lọc
                 </button>
             </div>
 
             <div>
-                <label class="form-label">&nbsp;</label>
-                <button class="btn btn-secondary w-100" id="clearFiltersBtn">
-                    <i class="fas fa-eraser me-1"></i> Xóa bộ lọc
+                <label class="pr-form-label">&nbsp;</label>
+                <button class="pr-btn pr-btn-secondary" id="clearFiltersBtn">
+                    <i class="fas fa-eraser"></i> Xóa bộ lọc
                 </button>
             </div>
         </div>
     </div>
 
     <!-- FILTER TABS -->
-    <ul class="nav nav-tabs" id="requestTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
-                <i class="fas fa-list me-1"></i> Tất cả
-                <span class="badge bg-primary ms-1" id="allCount">0</span>
+    <ul class="pr-nav-tabs">
+        <li class="pr-nav-item">
+            <button class="pr-nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
+                <i class="fas fa-list"></i> Tất cả
+                <span class="badge pr-bg-primary" id="allCount">0</span>
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="overtime-tab" data-bs-toggle="tab" data-bs-target="#overtime" type="button">
-                <i class="fas fa-clock me-1"></i> Tăng ca
-                <span class="badge bg-warning ms-1" id="overtimeCount">0</span>
+        <li class="pr-nav-item">
+            <button class="pr-nav-link" id="overtime-tab" data-bs-toggle="tab" data-bs-target="#overtime" type="button">
+                <i class="fas fa-clock"></i> Tăng ca
+                <span class="badge pr-bg-info" id="overtimeCount">0</span>
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="leave-tab" data-bs-toggle="tab" data-bs-target="#leave" type="button">
-                <i class="fas fa-umbrella-beach me-1"></i> Nghỉ phép
-                <span class="badge bg-info ms-1" id="leaveCount">0</span>
+        <li class="pr-nav-item">
+            <button class="pr-nav-link" id="leave-tab" data-bs-toggle="tab" data-bs-target="#leave" type="button">
+                <i class="fas fa-umbrella-beach"></i> Nghỉ phép
+                <span class="badge pr-bg-primary" id="leaveCount">0</span>
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="late-tab" data-bs-toggle="tab" data-bs-target="#late" type="button">
-                <i class="fas fa-user-clock me-1"></i> Đi trễ
-                <span class="badge bg-danger ms-1" id="lateCount">0</span>
+        <li class="pr-nav-item">
+            <button class="pr-nav-link" id="late-tab" data-bs-toggle="tab" data-bs-target="#late" type="button">
+                <i class="fas fa-user-clock"></i> Đi trễ
+                <span class="badge pr-bg-danger" id="lateCount">0</span>
             </button>
         </li>
     </ul>
@@ -153,16 +153,16 @@
     <!-- TAB CONTENT -->
     <div class="tab-content" id="requestTabContent">
         <div class="tab-pane fade show active" id="all">
-            <div id="allList" class="requests-grid"></div>
+            <div id="allList" class="pr-requests-grid"></div>
         </div>
         <div class="tab-pane fade" id="overtime">
-            <div id="overtimeList" class="requests-grid"></div>
+            <div id="overtimeList" class="pr-requests-grid"></div>
         </div>
         <div class="tab-pane fade" id="leave">
-            <div id="leaveList" class="requests-grid"></div>
+            <div id="leaveList" class="pr-requests-grid"></div>
         </div>
         <div class="tab-pane fade" id="late">
-            <div id="lateList" class="requests-grid"></div>
+            <div id="lateList" class="pr-requests-grid"></div>
         </div>
     </div>
 </div>
@@ -178,19 +178,19 @@
             <div class="modal-body">
                 <div id="reviewDetails"></div>
                 <div class="mb-3 mt-4">
-                    <label class="form-label fw-bold">Ghi chú (tùy chọn)</label>
-                    <textarea id="reviewNote" class="form-control" rows="3" placeholder="Nhập lý do hoặc ghi chú..."></textarea>
+                    <label class="pr-form-label fw-bold">Ghi chú (tùy chọn)</label>
+                    <textarea id="reviewNote" class="pr-form-control" rows="3" placeholder="Nhập lý do hoặc ghi chú..." style="resize: vertical; min-height: 90px;"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-1"></i> Hủy
+                <button type="button" class="pr-btn pr-btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Hủy
                 </button>
-                <button type="button" class="btn btn-danger" onclick="reviewRequest('Reject')">
-                    <i class="fas fa-ban me-1"></i> Từ chối
+                <button type="button" class="pr-btn pr-btn-danger" onclick="reviewRequest('Reject')">
+                    <i class="fas fa-ban"></i> Từ chối
                 </button>
-                <button type="button" class="btn btn-success" onclick="reviewRequest('Approve')">
-                    <i class="fas fa-check me-1"></i> Phê duyệt
+                <button type="button" class="pr-btn pr-btn-success" onclick="reviewRequest('Approve')">
+                    <i class="fas fa-check"></i> Phê duyệt
                 </button>
             </div>
         </div>
@@ -263,7 +263,7 @@
 
             if (all.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="pr-empty-state">
                         <i class="fas fa-inbox"></i>
                         <h5>Không có đề xuất nào phù hợp</h5>
                     </div>
@@ -278,7 +278,7 @@
             const container = document.getElementById('overtimeList');
             if (allRequests.overtime.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="pr-empty-state">
                         <i class="fas fa-clock"></i>
                         <h5>Không có đề xuất tăng ca</h5>
                     </div>
@@ -293,7 +293,7 @@
             const container = document.getElementById('leaveList');
             if (allRequests.leave.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="pr-empty-state">
                         <i class="fas fa-umbrella-beach"></i>
                         <h5>Không có đề xuất nghỉ phép</h5>
                     </div>
@@ -308,7 +308,7 @@
             const container = document.getElementById('lateList');
             if (allRequests.late.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="pr-empty-state">
                         <i class="fas fa-user-clock"></i>
                         <h5>Không có đề xuất đi trễ</h5>
                     </div>
@@ -324,7 +324,7 @@
 
             if (req.overtimeRequestId) {
                 typeLabel = 'Tăng ca';
-                typeClass = 'request-type-overtime';
+                typeClass = 'pr-request-type-overtime';
                 requestId = req.overtimeRequestId;
                 requestType = 'Overtime';
                 details = `
@@ -334,7 +334,7 @@
                 `;
             } else if (req.leaveRequestId) {
                 typeLabel = req.leaveType || 'Nghỉ phép';
-                typeClass = 'request-type-leave';
+                typeClass = 'pr-request-type-leave';
                 requestId = req.leaveRequestId;
                 requestType = 'Leave';
                 details = `
@@ -344,7 +344,7 @@
                 `;
             } else if (req.lateRequestId) {
                 typeLabel = 'Đi trễ';
-                typeClass = 'request-type-late';
+                typeClass = 'pr-request-type-late';
                 requestId = req.lateRequestId;
                 requestType = 'Late';
                 details = `
@@ -358,29 +358,29 @@
             const statusText = getStatusText(req.status);
 
             return `
-                <div class="request-card fade-in">
-                    <div class="request-card-header">
-                        <span class="request-type-badge ${typeClass}">${typeLabel}</span>
-                        <span class="badge ${statusClass}">${statusText}</span>
+                <div class="pr-request-card pr-fade-in">
+                    <div class="pr-request-card-header">
+                        <span class="pr-request-type-badge ${typeClass}">${typeLabel}</span>
+                        <span class="pr-badge ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="user-info">
-                        <div class="user-details">
+                    <div class="pr-user-info">
+                        <div class="pr-user-details">
                             <strong>${req.employeeName || 'N/A'}</strong>
                             <small>${req.employeeId || 'N/A'}</small>
                         </div>
                     </div>
-                    <div class="request-details">
+                    <div class="pr-request-details">
                         ${details}
                     </div>
-                    <div class="request-meta">
+                    <div class="pr-request-meta">
                         <small><i class="far fa-clock me-1"></i>Tạo lúc: ${formatDateTime(req.createdAt)}</small>
                     </div>
-                    <div class="request-actions">
-                        <button class="btn btn-info btn-sm" onclick="viewRequestDetail('${requestType}', ${requestId})">
-                            <i class="fas fa-eye me-1"></i> Chi tiết
+                    <div class="pr-request-actions">
+                        <button class="pr-btn pr-btn-info pr-btn-sm" onclick="viewRequestDetail('${requestType}', ${requestId})">
+                            <i class="fas fa-eye"></i> Chi tiết
                         </button>
-                        <button class="btn btn-primary btn-sm" onclick="openReviewModal(${requestId}, '${requestType}')">
-                            <i class="fas fa-clipboard-check me-1"></i> Duyệt
+                        <button class="pr-btn pr-btn-primary pr-btn-sm" onclick="openReviewModal(${requestId}, '${requestType}')">
+                            <i class="fas fa-clipboard-check"></i> Duyệt
                         </button>
                     </div>
                 </div>
@@ -409,14 +409,14 @@
 
                 if (data.success) {
                     const req = data.request;
-                    let html = '<div class="request-detail-grid">';
+                    let html = '<div class="pr-request-detail-grid">';
 
                     html += `
-                        <div class="detail-row">
+                        <div class="pr-detail-row">
                             <strong>Trạng thái:</strong>
-                            <span class="badge ${getStatusClass(req.status)}">${getStatusText(req.status)}</span>
+                            <span class="pr-badge ${getStatusClass(req.status)}">${getStatusText(req.status)}</span>
                         </div>
-                        <div class="detail-row">
+                        <div class="pr-detail-row">
                             <strong>Nhân viên:</strong>
                             <span>${req.employeeName || 'N/A'}</span>
                         </div>
@@ -424,38 +424,38 @@
 
                     if (type === 'Overtime') {
                         html += `
-                            <div class="detail-row"><strong>Ngày:</strong><span>${req.workDate || 'N/A'}</span></div>
-                            <div class="detail-row"><strong>Giờ check-out:</strong><span>${req.actualCheckOutTime || 'N/A'}</span></div>
-                            <div class="detail-row"><strong>Số giờ:</strong><span>${req.overtimeHours}h</span></div>
-                            <div class="detail-row"><strong>Lý do:</strong><span>${req.reason || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Ngày:</strong><span>${req.workDate || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Giờ check-out:</strong><span>${req.actualCheckOutTime || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Số giờ:</strong><span>${req.overtimeHours}h</span></div>
+                            <div class="pr-detail-row"><strong>Lý do:</strong><span>${req.reason || 'N/A'}</span></div>
                         `;
                     } else if (type === 'Leave') {
                         html += `
-                            <div class="detail-row"><strong>Loại:</strong><span>${req.leaveType}</span></div>
-                            <div class="detail-row"><strong>Từ ngày:</strong><span>${req.startDate || 'N/A'}</span></div>
-                            <div class="detail-row"><strong>Đến ngày:</strong><span>${req.endDate || 'N/A'}</span></div>
-                            <div class="detail-row"><strong>Số ngày:</strong><span>${req.totalDays} ngày</span></div>
-                            <div class="detail-row"><strong>Lý do:</strong><span>${req.reason || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Loại:</strong><span>${req.leaveType}</span></div>
+                            <div class="pr-detail-row"><strong>Từ ngày:</strong><span>${req.startDate || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Đến ngày:</strong><span>${req.endDate || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Số ngày:</strong><span>${req.totalDays} ngày</span></div>
+                            <div class="pr-detail-row"><strong>Lý do:</strong><span>${req.reason || 'N/A'}</span></div>
                         `;
                     } else if (type === 'Late') {
                         html += `
-                            <div class="detail-row"><strong>Ngày:</strong><span>${req.requestDate || 'N/A'}</span></div>
-                            <div class="detail-row"><strong>Dự kiến đến:</strong><span>${req.expectedArrivalTime}</span></div>
-                            <div class="detail-row"><strong>Lý do:</strong><span>${req.reason || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Ngày:</strong><span>${req.requestDate || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Dự kiến đến:</strong><span>${req.expectedArrivalTime}</span></div>
+                            <div class="pr-detail-row"><strong>Lý do:</strong><span>${req.reason || 'N/A'}</span></div>
                         `;
                     }
 
                     if (req.reviewedAt && req.reviewedAt !== '') {
                         html += `
-                            <div class="detail-row"><strong>Người duyệt:</strong><span>${req.reviewedBy || 'N/A'}</span></div>
-                            <div class="detail-row"><strong>Thời gian duyệt:</strong><span>${req.reviewedAt}</span></div>
+                            <div class="pr-detail-row"><strong>Người duyệt:</strong><span>${req.reviewedBy || 'N/A'}</span></div>
+                            <div class="pr-detail-row"><strong>Thời gian duyệt:</strong><span>${req.reviewedAt}</span></div>
                         `;
                         if (req.reviewNote) {
-                            html += `<div class="detail-row"><strong>Ghi chú:</strong><span>${req.reviewNote}</span></div>`;
+                            html += `<div class="pr-detail-row"><strong>Ghi chú:</strong><span>${req.reviewNote}</span></div>`;
                         }
                     }
 
-                    html += `<div class="detail-row"><strong>Tạo lúc:</strong><span>${req.createdAt}</span></div>`;
+                    html += `<div class="pr-detail-row"><strong>Tạo lúc:</strong><span>${req.createdAt}</span></div>`;
                     html += '</div>';
 
                     if (inModal) {
@@ -528,10 +528,10 @@
 
         function getStatusClass(status) {
             switch(status) {
-                case 'Pending': return 'bg-warning';
-                case 'Approved': return 'bg-success';
-                case 'Rejected': return 'bg-danger';
-                default: return 'bg-secondary';
+                case 'Pending': return 'pr-bg-warning';
+                case 'Approved': return 'pr-bg-success';
+                case 'Rejected': return 'pr-bg-danger';
+                default: return 'pr-bg-secondary';
             }
         }
 
@@ -573,14 +573,14 @@
             document.getElementById('filterTo').value = '';
             document.getElementById('filterKeyword').value = '';
             currentFilters = { type: '', status: '', from: '', to: '', keyword: '' };
-            document.querySelectorAll('.quick-filter').forEach(b => b.classList.remove('active'));
-            document.querySelector('.quick-filter[data-status=""]').classList.add('active');
+            document.querySelectorAll('.pr-quick-filter').forEach(b => b.classList.remove('active'));
+            document.querySelector('.pr-quick-filter[data-status=""]').classList.add('active');
             loadPendingRequests();
         });
 
-        document.querySelectorAll('.quick-filter').forEach(btn => {
+        document.querySelectorAll('.pr-quick-filter').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.quick-filter').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.pr-quick-filter').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentFilters.status = btn.dataset.status || '';
                 currentFilters.type = '';
