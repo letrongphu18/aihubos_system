@@ -1,57 +1,58 @@
 ﻿/* ========================================
-   STAFF DASHBOARD - SCOPED CSS
-   All selectors prefixed to avoid conflicts
-   Prefix: .sd-container
+   STAFF DASHBOARD - MODERN MINIMALIST STYLE
+   With Light/Dark Mode Support
    ======================================== */
 
+/* ===== LIGHT MODE (DEFAULT) ===== */
 :root {
-    /* Primary Colors - Red/Coral Theme */
-    --sd-primary: #ff6b6b;
-    --sd-primary-dark: #ff5252;
-    --sd-primary-light: #ff8787;
-    /* Status Colors */
-    --sd-success: #51cf66;
-    --sd-success-light: #d3f9d8;
-    --sd-warning: #ffd93d;
-    --sd-warning-light: #fff3bf;
-    --sd-danger: #ff6b6b;
-    --sd-danger-light: #ffe3e3;
-    --sd-info: #74c0fc;
-    --sd-info-light: #d0ebff;
-    /* Neutral Colors */
-    --sd-dark: #2d3436;
-    --sd-light: #f5f7fa;
-    --sd-white: #ffffff;
-    --sd-text-muted: #868e96;
-    --sd-gray-100: #f1f3f5;
-    --sd-gray-200: #e9ecef;
-    --sd-gray-300: #dee2e6;
-    --sd-gray-400: #ced4da;
-    /* Shadows */
-    --sd-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --sd-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-    --sd-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
-    /* Transitions */
-    --sd-transition-fast: all 0.2s ease;
-    --sd-transition-normal: all 0.3s ease;
-    --sd-transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Border Radius */
-    --sd-radius: 12px;
-    --sd-radius-sm: 8px;
-    --sd-radius-lg: 16px;
+    /* PRIMARY COLORS FROM PALETTE */
+    --sd-navy: #0F1330;
+    --sd-pale: #E9D9C5;
+    --sd-sand: #C3A387;
+    /* SECONDARY COLORS */
+    --sd-terracotta: #7A3F30;
+    --sd-golden: #D4A459;
+    --sd-clay: #CC7051;
+    /* SYSTEM COLORS */
+    --sd-success: #10B981;
+    --sd-info: #3B82F6;
+    --sd-warning: #F59E0B;
+    --sd-danger: #EF4444;
+    /* LIGHT MODE VARIABLES */
+    --sd-bg-primary: #FFFFFF;
+    --sd-bg-secondary: #FAF8F5;
+    --sd-bg-tertiary: #F5F3F0;
+    --sd-text-primary: #0F1330;
+    --sd-text-secondary: #6B7280;
+    --sd-border-color: #E9E6E1;
+    --sd-shadow: rgba(15, 19, 48, 0.08);
+    --sd-shadow-lg: rgba(15, 19, 48, 0.12);
+    --sd-hover-bg: #FBF8F4;
 }
 
-/* ========================================
-   MAIN CONTAINER & LAYOUT
-   ======================================== */
+/* ===== DARK MODE ===== */
+body.dark-mode {
+    /* DARK MODE VARIABLES */
+    --sd-bg-primary: #1a1d2e;
+    --sd-bg-secondary: #121523;
+    --sd-bg-tertiary: #0d0f1a;
+    --sd-text-primary: #E9D9C5;
+    --sd-text-secondary: #9CA3AF;
+    --sd-border-color: #2d3142;
+    --sd-shadow: rgba(0, 0, 0, 0.3);
+    --sd-shadow-lg: rgba(0, 0, 0, 0.5);
+    --sd-hover-bg: #252837;
+}
 
 .sd-container {
     max-width: 1600px;
     margin: 0 auto;
     padding: 24px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: var(--sd-dark);
+    color: var(--sd-text-primary);
     line-height: 1.6;
+    background: var(--sd-bg-secondary);
+    transition: background 0.3s ease;
 }
 
     .sd-container .row {
@@ -111,15 +112,14 @@
 /* ========================================
    PAGE HEADER
    ======================================== */
-
 .sd-container .sd-page-header {
-    background: var(--sd-white);
-    border-radius: var(--sd-radius-lg);
-    padding: 32px;
+    background: var(--sd-bg-primary);
+    border-radius: 12px;
+    padding: 24px;
     margin-bottom: 32px;
-    box-shadow: var(--sd-shadow-sm);
-    border: 1px solid var(--sd-gray-200);
-    animation: sd-fadeIn 0.5s ease-out;
+    box-shadow: 0 4px 12px var(--sd-shadow);
+    border: 1px solid var(--sd-border-color);
+    transition: all 0.3s ease;
 }
 
     .sd-container .sd-page-header .row {
@@ -131,216 +131,171 @@
 }
 
 .sd-container .sd-page-title {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--sd-dark);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--sd-text-primary);
     margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 12px;
-    letter-spacing: -0.5px;
 }
 
     .sd-container .sd-page-title i {
-        color: var(--sd-primary);
-        font-size: 32px;
-        animation: sd-wave 2s ease-in-out infinite;
+        color: var(--sd-terracotta);
+        font-size: 28px;
     }
 
 .sd-container .sd-page-subtitle {
     font-size: 14px;
-    color: var(--sd-text-muted);
+    color: var(--sd-text-secondary);
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    font-weight: 600;
+    font-weight: 500;
 }
 
     .sd-container .sd-page-subtitle i {
-        color: var(--sd-primary);
+        color: var(--sd-golden);
     }
 
 /* ========================================
    TIME DISPLAY
    ======================================== */
-
 .sd-container .sd-current-time {
     text-align: right;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, var(--sd-primary) 0%, var(--sd-primary-light) 100%);
-    border-radius: var(--sd-radius);
-    color: white;
-    box-shadow: var(--sd-shadow-md);
+    padding: 12px 16px;
+    background: var(--sd-bg-tertiary);
+    border-radius: 8px;
+    color: var(--sd-text-primary);
+    box-shadow: 0 2px 8px var(--sd-shadow);
+    font-size: 14px;
+    transition: all 0.3s ease;
 }
 
 .sd-container .sd-date-display {
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 4px;
-    opacity: 0.95;
 }
 
 .sd-container .sd-time-display {
-    font-size: 24px;
-    font-weight: 800;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 1px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .sd-container .sd-text-muted {
-    font-size: 11px;
-    opacity: 0.8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 12px;
+    color: var(--sd-text-secondary);
 }
 
 /* ========================================
    QUICK REQUEST BUTTONS
    ======================================== */
-
 .sd-container .sd-quick-requests {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    margin-top: 16px;
 }
 
-    .sd-container .sd-quick-requests button,
     .sd-container .sd-quick-requests .btn {
-        padding: 10px 16px;
-        border: none;
-        border-radius: var(--sd-radius-sm);
+        padding: 8px 16px;
+        border-radius: 8px;
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 600;
         cursor: pointer;
-        transition: var(--sd-transition-normal);
+        transition: all 0.25s ease;
         display: flex;
         align-items: center;
-        gap: 6px;
-        box-shadow: var(--sd-shadow-sm);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        gap: 8px;
+        box-shadow: 0 2px 8px var(--sd-shadow);
     }
 
-        .sd-container .sd-quick-requests button:hover,
         .sd-container .sd-quick-requests .btn:hover {
             transform: translateY(-2px);
-            box-shadow: var(--sd-shadow-md);
-        }
-
-        .sd-container .sd-quick-requests button:active,
-        .sd-container .sd-quick-requests .btn:active {
-            transform: translateY(0);
+            box-shadow: 0 4px 12px var(--sd-shadow-lg);
         }
 
 .sd-container .btn-warning {
-    background: linear-gradient(135deg, var(--sd-warning), #ffe066);
-    color: #e67700;
+    background: linear-gradient(135deg, var(--sd-warning) 0%, var(--sd-golden) 100%);
+    color: var(--sd-navy);
+    border: none;
 }
 
 .sd-container .btn-info {
-    background: linear-gradient(135deg, var(--sd-info), #a5d8ff);
-    color: #1864ab;
+    background: linear-gradient(135deg, var(--sd-info) 0%, var(--sd-clay) 100%);
+    color: white;
+    border: none;
 }
 
 .sd-container .btn-danger {
-    background: linear-gradient(135deg, var(--sd-danger), #ff8787);
+    background: linear-gradient(135deg, var(--sd-danger) 0%, var(--sd-terracotta) 100%);
     color: white;
-}
-
-.sd-container .btn-warning:hover {
-    filter: brightness(1.1);
-}
-
-.sd-container .btn-info:hover {
-    filter: brightness(1.1);
-}
-
-.sd-container .btn-danger:hover {
-    filter: brightness(1.1);
+    border: none;
 }
 
 /* ========================================
    STATISTICS CARDS
    ======================================== */
-
 .sd-container .sd-stats-card {
-    background: var(--sd-white);
-    border-radius: var(--sd-radius-lg);
-    padding: 24px;
-    box-shadow: var(--sd-shadow-sm);
-    border: 1px solid var(--sd-gray-200);
+    background: var(--sd-bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px var(--sd-shadow);
+    border: 1px solid var(--sd-border-color);
     display: flex;
     align-items: center;
-    gap: 18px;
-    transition: var(--sd-transition-normal);
+    gap: 16px;
+    transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
-    animation: sd-slideUp 0.5s ease-out;
 }
+
+    .sd-container .sd-stats-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px var(--sd-shadow-lg);
+    }
 
     .sd-container .sd-stats-card::before {
         content: '';
         position: absolute;
         top: 0;
+        height: 4px;
         left: 0;
         right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, rgba(255, 107, 107, 0.1), transparent);
-    }
-
-    .sd-container .sd-stats-card:hover {
-        box-shadow: var(--sd-shadow-lg);
-        transform: translateY(-4px);
-    }
-
-    .sd-container .sd-stats-card.sd-stats-primary::before {
-        background: linear-gradient(90deg, var(--sd-primary), var(--sd-primary-light));
-    }
-
-    .sd-container .sd-stats-card.sd-stats-success::before {
-        background: linear-gradient(90deg, var(--sd-success), #69db7c);
-    }
-
-    .sd-container .sd-stats-card.sd-stats-warning::before {
-        background: linear-gradient(90deg, var(--sd-warning), #ffe066);
-    }
-
-    .sd-container .sd-stats-card.sd-stats-info::before {
-        background: linear-gradient(90deg, var(--sd-info), #94d82d);
+        background: linear-gradient(90deg, var(--sd-terracotta), var(--sd-clay));
     }
 
 .sd-container .sd-stats-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 14px;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 135, 135, 0.1));
-    color: var(--sd-primary);
+    font-size: 24px;
+    background: rgba(122, 63, 48, 0.1);
+    color: var(--sd-terracotta);
 }
 
 .sd-container .sd-stats-primary .sd-stats-icon {
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 135, 135, 0.1));
-    color: var(--sd-primary);
+    background: rgba(15, 19, 48, 0.1);
+    color: var(--sd-navy);
 }
 
 .sd-container .sd-stats-success .sd-stats-icon {
-    background: linear-gradient(135deg, rgba(81, 207, 102, 0.15), rgba(105, 219, 124, 0.1));
+    background: rgba(16, 185, 129, 0.1);
     color: var(--sd-success);
 }
 
 .sd-container .sd-stats-warning .sd-stats-icon {
-    background: linear-gradient(135deg, rgba(255, 217, 61, 0.15), rgba(255, 224, 102, 0.1));
+    background: rgba(245, 158, 11, 0.1);
     color: var(--sd-warning);
 }
 
 .sd-container .sd-stats-info .sd-stats-icon {
-    background: linear-gradient(135deg, rgba(116, 192, 252, 0.15), rgba(148, 216, 130, 0.1));
+    background: rgba(59, 130, 246, 0.1);
     color: var(--sd-info);
 }
 
@@ -349,59 +304,53 @@
 }
 
 .sd-container .sd-stats-label {
-    font-size: 13px;
-    color: var(--sd-text-muted);
-    font-weight: 600;
+    font-size: 12px;
+    color: var(--sd-text-secondary);
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .sd-container .sd-stats-value {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--sd-dark);
-    line-height: 1;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--sd-text-primary);
 }
 
 .sd-container .sd-stats-trend {
-    font-size: 20px;
-    color: var(--sd-gray-400);
+    font-size: 18px;
+    color: var(--sd-text-secondary);
 }
 
 /* ========================================
    CARD COMPONENTS
    ======================================== */
-
 .sd-container .sd-card {
-    background: var(--sd-white);
-    border-radius: var(--sd-radius-lg);
-    box-shadow: var(--sd-shadow-sm);
-    border: 1px solid var(--sd-gray-200);
+    background: var(--sd-bg-primary);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--sd-shadow);
+    border: 1px solid var(--sd-border-color);
     overflow: hidden;
-    transition: var(--sd-transition-normal);
-    animation: sd-slideUp 0.5s ease-out;
+    transition: all 0.25s ease;
 }
 
     .sd-container .sd-card:hover {
-        box-shadow: var(--sd-shadow-md);
+        box-shadow: 0 8px 24px var(--sd-shadow-lg);
     }
 
 .sd-container .sd-card-header {
-    padding: 24px;
-    border-bottom: 1px solid var(--sd-gray-200);
+    padding: 20px;
+    border-bottom: 1px solid var(--sd-border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    gap: 16px;
-    flex-wrap: wrap;
+    background: var(--sd-bg-tertiary);
 }
 
     .sd-container .sd-card-header h5 {
         font-size: 16px;
         font-weight: 700;
-        color: var(--sd-dark);
+        color: var(--sd-text-primary);
         display: flex;
         align-items: center;
         gap: 10px;
@@ -409,33 +358,31 @@
     }
 
         .sd-container .sd-card-header h5 i {
-            color: var(--sd-primary);
+            color: var(--sd-terracotta);
             font-size: 18px;
         }
 
     .sd-container .sd-card-header .btn {
         font-size: 13px;
         font-weight: 600;
-        color: var(--sd-primary);
+        color: var(--sd-text-primary);
         text-decoration: none;
         display: flex;
         align-items: center;
         gap: 6px;
-        transition: var(--sd-transition-fast);
+        transition: all 0.2s ease;
         padding: 8px 12px;
-        border-radius: var(--sd-radius-sm);
-        border: none;
+        border-radius: 8px;
         background: transparent;
-        cursor: pointer;
     }
 
         .sd-container .sd-card-header .btn:hover {
-            background: rgba(255, 107, 107, 0.1);
-            color: var(--sd-primary-dark);
+            background: var(--sd-hover-bg);
+            color: var(--sd-clay);
         }
 
 .sd-container .sd-card-body {
-    padding: 24px;
+    padding: 20px;
 }
 
     .sd-container .sd-card-body.p-0 {
@@ -445,7 +392,6 @@
 /* ========================================
    PHOTO OPTIONS
    ======================================== */
-
 .sd-container .sd-photo-options {
     margin-bottom: 16px;
 }
@@ -456,49 +402,38 @@
         width: 100%;
     }
 
-.sd-container .btn-check {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
+.sd-container .btn-check + label {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--sd-border-color);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--sd-bg-primary);
+    font-weight: 600;
+    color: var(--sd-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-    .sd-container .btn-check + label {
-        flex: 1;
-        padding: 12px;
-        border: 2px solid var(--sd-gray-300);
-        border-radius: var(--sd-radius-sm);
-        text-align: center;
-        cursor: pointer;
-        transition: var(--sd-transition-normal);
-        background: white;
-        font-weight: 600;
-        color: var(--sd-text-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
+.sd-container .btn-check:checked + label {
+    background: linear-gradient(135deg, var(--sd-terracotta) 0%, var(--sd-clay) 100%);
+    color: white;
+    border-color: var(--sd-terracotta);
+}
 
-    .sd-container .btn-check:checked + label {
-        background: linear-gradient(135deg, var(--sd-primary), var(--sd-primary-light));
-        color: white;
-        border-color: var(--sd-primary);
-    }
-
-    .sd-container .btn-check + label:hover {
-        border-color: var(--sd-primary);
-        transform: translateY(-2px);
-        box-shadow: var(--sd-shadow-sm);
-    }
+.sd-container .btn-check + label:hover {
+    border-color: var(--sd-golden);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--sd-shadow);
+}
 
 /* ========================================
    CAMERA & UPLOAD
    ======================================== */
-
-.sd-container .photo-mode {
-    width: 100%;
-}
-
 .sd-container .sd-camera-container,
 .sd-container .sd-upload-container {
     width: 100%;
@@ -507,15 +442,16 @@
 .sd-container .sd-camera-preview,
 .sd-container .sd-upload-preview {
     width: 100%;
-    height: 300px;
-    border-radius: var(--sd-radius);
+    height: 280px;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
-    background: var(--sd-gray-100);
+    background: var(--sd-bg-tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 8px var(--sd-shadow);
+    border: 1px solid var(--sd-border-color);
 }
 
 .sd-container #video,
@@ -529,11 +465,10 @@
 .sd-container .sd-camera-overlay {
     position: absolute;
     inset: 0;
-    border: 3px dashed var(--sd-primary);
-    margin: 16px;
-    border-radius: var(--sd-radius-sm);
+    border: 2px dashed var(--sd-golden);
+    margin: 12px;
+    border-radius: 8px;
     pointer-events: none;
-    animation: sd-pulse 2s ease-in-out infinite;
 }
 
 .sd-container .sd-camera-controls,
@@ -545,38 +480,34 @@
 }
 
 .sd-container .sd-btn-camera {
-    width: 64px;
-    height: 64px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    border: 4px solid white;
-    background: linear-gradient(135deg, var(--sd-primary), var(--sd-primary-light));
+    background: linear-gradient(135deg, var(--sd-terracotta), var(--sd-clay));
     color: white;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
-    transition: var(--sd-transition-normal);
-    box-shadow: var(--sd-shadow-md);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px var(--sd-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
+    border: none;
 }
 
     .sd-container .sd-btn-camera:hover {
         transform: scale(1.1);
-        box-shadow: var(--sd-shadow-lg);
-    }
-
-    .sd-container .sd-btn-camera:active {
-        transform: scale(1.05);
+        box-shadow: 0 8px 24px var(--sd-shadow-lg);
     }
 
     .sd-container .sd-btn-camera.sd-btn-warning {
-        background: linear-gradient(135deg, var(--sd-warning), #ffe066);
+        background: linear-gradient(135deg, var(--sd-warning), var(--sd-golden));
+        color: var(--sd-navy);
     }
 
 /* ========================================
    UPLOAD PLACEHOLDER
    ======================================== */
-
 .sd-container .sd-upload-placeholder {
     width: 100%;
     height: 100%;
@@ -585,28 +516,26 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--sd-transition-normal);
-    color: var(--sd-text-muted);
+    transition: all 0.25s ease;
+    color: var(--sd-text-secondary);
 }
 
     .sd-container .sd-upload-placeholder:hover {
-        background: var(--sd-gray-200);
-        color: var(--sd-primary);
+        color: var(--sd-clay);
     }
 
     .sd-container .sd-upload-placeholder i {
-        font-size: 48px;
+        font-size: 40px;
         margin-bottom: 12px;
     }
 
     .sd-container .sd-upload-placeholder p {
-        font-weight: 600;
+        font-weight: 500;
     }
 
 /* ========================================
    ATTENDANCE INFO
    ======================================== */
-
 .sd-container .sd-attendance-info {
     height: 100%;
     display: flex;
@@ -616,114 +545,113 @@
 
 .sd-container .sd-attendance-status {
     padding: 16px;
-    background: var(--sd-gray-100);
-    border-radius: var(--sd-radius);
+    background: var(--sd-bg-tertiary);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 12px;
+    border: 1px solid var(--sd-border-color);
 }
 
 .sd-container .sd-location-box {
-    background: var(--sd-gray-100);
-    border-radius: var(--sd-radius);
+    background: var(--sd-bg-tertiary);
+    border-radius: 12px;
     padding: 16px;
+    border: 1px solid var(--sd-border-color);
 }
 
     .sd-container .sd-location-box h6 {
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 600;
         margin-bottom: 12px;
-        color: var(--sd-dark);
+        color: var(--sd-text-primary);
     }
 
 .sd-container .sd-form-label {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: var(--sd-dark);
+    color: var(--sd-text-primary);
     margin-bottom: 8px;
 }
 
 .sd-container .sd-form-control {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--sd-gray-300);
-    border-radius: var(--sd-radius-sm);
+    border: 1px solid var(--sd-border-color);
+    border-radius: 8px;
     font-size: 14px;
-    transition: var(--sd-transition-fast);
-    font-family: inherit;
-    background: white;
+    transition: all 0.2s ease;
+    background: var(--sd-bg-primary);
+    color: var(--sd-text-primary);
 }
 
     .sd-container .sd-form-control:focus {
         outline: none;
-        border-color: var(--sd-primary);
-        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        border-color: var(--sd-golden);
+        box-shadow: 0 0 0 3px rgba(212, 164, 89, 0.1);
     }
 
 .sd-container .sd-check-info {
     padding: 16px;
-    background: var(--sd-info-light);
-    border-radius: var(--sd-radius);
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 12px;
     border-left: 4px solid var(--sd-info);
 }
 
 /* ========================================
    ALERTS
    ======================================== */
-
 .sd-container .alert {
+    border-radius: 12px;
     padding: 16px;
-    border-radius: var(--sd-radius-sm);
     margin-bottom: 16px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
-    animation: sd-slideDown 0.3s ease-out;
-    font-size: 14px;
+    box-shadow: 0 2px 8px var(--sd-shadow);
+    border: none;
 }
 
     .sd-container .alert i {
-        font-size: 16px;
-        flex-shrink: 0;
+        font-size: 20px;
     }
 
 .sd-container .alert-info {
-    background: var(--sd-info-light);
-    color: #1864ab;
+    background: rgba(59, 130, 246, 0.05);
+    color: var(--sd-info);
     border-left: 4px solid var(--sd-info);
 }
 
 .sd-container .alert-success {
-    background: var(--sd-success-light);
-    color: #2b8a3e;
+    background: rgba(16, 185, 129, 0.05);
+    color: var(--sd-success);
     border-left: 4px solid var(--sd-success);
 }
 
 .sd-container .alert-warning {
-    background: var(--sd-warning-light);
-    color: #e67700;
+    background: rgba(245, 158, 11, 0.05);
+    color: var(--sd-warning);
     border-left: 4px solid var(--sd-warning);
 }
 
 .sd-container .alert-danger {
-    background: var(--sd-danger-light);
-    color: #c92a2a;
+    background: rgba(239, 68, 68, 0.05);
+    color: var(--sd-danger);
     border-left: 4px solid var(--sd-danger);
 }
 
 /* ========================================
    BUTTONS
    ======================================== */
-
 .sd-container .btn {
     padding: 12px 24px;
     border: none;
-    border-radius: var(--sd-radius-sm);
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--sd-transition-normal);
+    transition: all 0.25s ease;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -733,98 +661,53 @@
 
     .sd-container .btn:hover {
         transform: translateY(-2px);
-        box-shadow: var(--sd-shadow-md);
-    }
-
-    .sd-container .btn:active {
-        transform: translateY(0);
+        box-shadow: 0 4px 12px var(--sd-shadow-lg);
     }
 
     .sd-container .btn:disabled {
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: not-allowed;
-        transform: none;
     }
 
 .sd-container .btn-primary {
-    background: linear-gradient(135deg, var(--sd-primary), var(--sd-primary-light));
+    background: linear-gradient(135deg, var(--sd-navy) 0%, #1a1f4a 100%);
     color: white;
 }
-
-    .sd-container .btn-primary:hover {
-        filter: brightness(1.1);
-    }
 
 .sd-container .btn-success {
-    background: linear-gradient(135deg, var(--sd-success), #69db7c);
+    background: linear-gradient(135deg, var(--sd-success) 0%, #34D399 100%);
     color: white;
 }
 
-    .sd-container .btn-success:hover {
-        filter: brightness(1.1);
-    }
-
 .sd-container .btn-secondary {
-    background: var(--sd-gray-300);
-    color: var(--sd-dark);
+    background: var(--sd-bg-tertiary);
+    color: var(--sd-text-primary);
 }
 
-    .sd-container .btn-secondary:hover {
-        background: var(--sd-gray-400);
-    }
-
 .sd-container .btn-lg {
-    padding: 16px 32px;
-    font-size: 18px;
-    font-weight: 700;
+    padding: 14px 28px;
+    font-size: 16px;
 }
 
 .sd-container .btn-sm {
     padding: 8px 16px;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .sd-container .btn-outline-primary {
     background: transparent;
-    color: var(--sd-primary);
-    border: 2px solid var(--sd-primary);
+    color: var(--sd-navy);
+    border: 1px solid var(--sd-border-color);
 }
 
     .sd-container .btn-outline-primary:hover {
-        background: var(--sd-primary);
-        color: white;
+        background: var(--sd-hover-bg);
+        color: var(--sd-terracotta);
     }
-
-.sd-container .btn-outline-success {
-    background: transparent;
-    color: var(--sd-success);
-    border: 2px solid var(--sd-success);
-}
-
-    .sd-container .btn-outline-success:hover {
-        background: var(--sd-success);
-        color: white;
-    }
-
-.sd-container .btn-outline-danger {
-    background: transparent;
-    color: var(--sd-danger);
-    border: 2px solid var(--sd-danger);
-}
-
-    .sd-container .btn-outline-danger:hover {
-        background: var(--sd-danger);
-        color: white;
-    }
-
-.sd-container .w-100 {
-    width: 100%;
-}
 
 /* ========================================
    TASKS
    ======================================== */
-
 .sd-container .sd-task-container {
     max-height: 500px;
     overflow-y: auto;
@@ -835,33 +718,28 @@
     }
 
     .sd-container .sd-task-container::-webkit-scrollbar-track {
-        background: var(--sd-gray-100);
+        background: transparent;
     }
 
     .sd-container .sd-task-container::-webkit-scrollbar-thumb {
-        background: var(--sd-gray-400);
+        background: var(--sd-border-color);
         border-radius: 3px;
     }
 
         .sd-container .sd-task-container::-webkit-scrollbar-thumb:hover {
-            background: var(--sd-primary);
+            background: var(--sd-text-secondary);
         }
 
 .sd-container .sd-task-item {
     padding: 16px;
-    border-bottom: 1px solid var(--sd-gray-200);
-    transition: var(--sd-transition-fast);
+    border-bottom: 1px solid var(--sd-border-color);
+    transition: all 0.25s ease;
     cursor: pointer;
-    animation: sd-slideUp 0.5s ease-out;
 }
 
     .sd-container .sd-task-item:hover {
-        background: var(--sd-gray-100);
+        background: var(--sd-hover-bg);
         transform: translateX(4px);
-    }
-
-    .sd-container .sd-task-item:last-child {
-        border-bottom: none;
     }
 
 .sd-container .sd-task-header {
@@ -874,7 +752,7 @@
 
 .sd-container .sd-task-title {
     font-weight: 600;
-    color: var(--sd-dark);
+    color: var(--sd-text-primary);
     flex: 1;
     font-size: 14px;
 }
@@ -883,25 +761,20 @@
     padding: 4px 10px;
     border-radius: 8px;
     font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    flex-shrink: 0;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: white;
 }
 
 .sd-container .badge-high {
-    background: rgba(255, 107, 107, 0.15);
-    color: var(--sd-danger);
+    background: var(--sd-terracotta);
 }
 
 .sd-container .badge-medium {
-    background: rgba(255, 217, 61, 0.15);
-    color: #e67700;
+    background: var(--sd-golden);
 }
 
 .sd-container .badge-low {
-    background: rgba(116, 192, 252, 0.15);
-    color: var(--sd-info);
+    background: var(--sd-clay);
 }
 
 .sd-container .sd-task-meta {
@@ -909,7 +782,7 @@
     flex-wrap: wrap;
     gap: 12px;
     font-size: 13px;
-    color: var(--sd-text-muted);
+    color: var(--sd-text-secondary);
 }
 
 .sd-container .sd-task-meta-item {
@@ -919,69 +792,66 @@
 }
 
 .sd-container .priority-high {
-    border-left: 3px solid var(--sd-danger);
+    border-left: 3px solid var(--sd-terracotta);
 }
 
 .sd-container .priority-medium {
-    border-left: 3px solid var(--sd-warning);
+    border-left: 3px solid var(--sd-golden);
 }
 
 .sd-container .priority-low {
-    border-left: 3px solid var(--sd-info);
+    border-left: 3px solid var(--sd-clay);
 }
 
 /* ========================================
    QUICK ACTIONS
    ======================================== */
-
 .sd-container .sd-quick-action-card {
     display: block;
-    background: var(--sd-white);
-    border-radius: var(--sd-radius);
-    padding: 24px;
-    box-shadow: var(--sd-shadow-sm);
-    border: 1px solid var(--sd-gray-200);
-    transition: var(--sd-transition-normal);
+    background: var(--sd-bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px var(--sd-shadow);
+    border: 1px solid var(--sd-border-color);
+    transition: all 0.25s ease;
     text-decoration: none;
     color: inherit;
-    animation: sd-slideUp 0.5s ease-out;
 }
 
     .sd-container .sd-quick-action-card:hover {
         transform: translateY(-4px);
-        box-shadow: var(--sd-shadow-lg);
+        box-shadow: 0 8px 24px var(--sd-shadow-lg);
     }
 
 .sd-container .sd-quick-action-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--sd-radius-sm);
-    background: linear-gradient(135deg, var(--sd-primary), var(--sd-primary-light));
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(122, 63, 48, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    color: white;
-    margin-bottom: 16px;
+    color: var(--sd-terracotta);
+    margin-bottom: 12px;
 }
 
 .sd-container .sd-quick-action-content h6 {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--sd-dark);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--sd-text-primary);
     margin-bottom: 4px;
 }
 
 .sd-container .sd-quick-action-content p {
-    font-size: 14px;
-    color: var(--sd-text-muted);
+    font-size: 13px;
+    color: var(--sd-text-secondary);
     margin: 0;
 }
 
 /* ========================================
    LOADING & EMPTY STATES
    ======================================== */
-
 .sd-container .sd-loading {
     display: flex;
     flex-direction: column;
@@ -991,10 +861,10 @@
 }
 
 .sd-container .spinner-border {
-    width: 48px;
-    height: 48px;
-    border: 4px solid var(--sd-gray-200);
-    border-top-color: var(--sd-primary);
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--sd-border-color);
+    border-top-color: var(--sd-golden);
     border-radius: 50%;
     animation: sd-spin 1s linear infinite;
 }
@@ -1007,100 +877,60 @@
 
 .sd-container .sd-empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: var(--sd-text-muted);
+    padding: 40px 20px;
+    color: var(--sd-text-secondary);
 }
 
     .sd-container .sd-empty-state i {
-        color: var(--sd-gray-300);
+        font-size: 48px;
         margin-bottom: 16px;
-        opacity: 0.6;
+        color: var(--sd-text-secondary);
     }
 
     .sd-container .sd-empty-state p {
         margin: 0;
+        font-size: 14px;
     }
 
 /* ========================================
    FORM ELEMENTS (FOR MODALS)
    ======================================== */
-
 .sd-container .form-label {
-    display: inline-block;
     margin-bottom: 0.5rem;
     font-weight: 600;
     font-size: 14px;
-    color: var(--sd-dark);
+    color: var(--sd-text-primary);
 }
 
-.sd-container .form-control {
-    display: block;
-    width: 100%;
+.sd-container .form-control,
+.sd-container .form-select {
     padding: 0.75rem;
     font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--sd-dark);
-    background-color: var(--sd-white);
-    background-clip: padding-box;
-    border: 2px solid var(--sd-gray-300);
-    border-radius: var(--sd-radius-sm);
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    color: var(--sd-text-primary);
+    background-color: var(--sd-bg-primary);
+    border: 1px solid var(--sd-border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
-    .sd-container .form-control:focus {
-        color: var(--sd-dark);
-        background-color: var(--sd-white);
-        border-color: var(--sd-primary);
-        outline: 0;
-        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
-    }
-
-.sd-container .form-select {
-    display: block;
-    width: 100%;
-    padding: 0.75rem 2.25rem 0.75rem 0.75rem;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--sd-dark);
-    background-color: var(--sd-white);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 16px 12px;
-    border: 2px solid var(--sd-gray-300);
-    border-radius: var(--sd-radius-sm);
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    appearance: none;
-}
-
+    .sd-container .form-control:focus,
     .sd-container .form-select:focus {
-        border-color: var(--sd-primary);
-        outline: 0;
-        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+        border-color: var(--sd-golden);
+        box-shadow: 0 0 0 3px rgba(212, 164, 89, 0.1);
     }
 
 .sd-container textarea.form-control {
-    resize: vertical;
     min-height: 80px;
 }
 
 .sd-container small.text-muted {
     font-size: 12px;
-    color: var(--sd-text-muted);
-}
-
-.sd-container hr {
-    border: 0;
-    border-top: 1px solid var(--sd-gray-200);
-    margin: 1rem 0;
+    color: var(--sd-text-secondary);
 }
 
 /* ========================================
    UTILITY CLASSES
    ======================================== */
-
 .sd-container .d-none {
     display: none !important;
 }
@@ -1111,10 +941,6 @@
 
 .sd-container .d-flex {
     display: flex !important;
-}
-
-.sd-container .d-inline-flex {
-    display: inline-flex !important;
 }
 
 .sd-container .justify-content-start {
@@ -1174,7 +1000,7 @@
 }
 
 .sd-container .text-primary {
-    color: var(--sd-primary) !important;
+    color: var(--sd-navy) !important;
 }
 
 .sd-container .text-success {
@@ -1182,7 +1008,7 @@
 }
 
 .sd-container .text-warning {
-    color: #e67700 !important;
+    color: var(--sd-warning) !important;
 }
 
 .sd-container .text-danger {
@@ -1194,19 +1020,19 @@
 }
 
 .sd-container .text-muted {
-    color: var(--sd-text-muted) !important;
+    color: var(--sd-text-secondary) !important;
 }
 
 .sd-container .bg-light {
-    background-color: var(--sd-light) !important;
+    background-color: var(--sd-bg-secondary) !important;
 }
 
 .sd-container .bg-white {
-    background-color: var(--sd-white) !important;
+    background-color: var(--sd-bg-primary) !important;
 }
 
 .sd-container .bg-primary {
-    background-color: var(--sd-primary) !important;
+    background-color: var(--sd-navy) !important;
 }
 
 .sd-container .m-0 {
@@ -1293,7 +1119,7 @@
 }
 
 .sd-container .border-top {
-    border-top: 1px solid var(--sd-gray-200) !important;
+    border-top: 1px solid var(--sd-border-color) !important;
 }
 
 .sd-container .fs-6 {
@@ -1303,7 +1129,6 @@
 /* ========================================
    ANIMATIONS & KEYFRAMES
    ======================================== */
-
 @keyframes sd-fadeIn {
     from {
         opacity: 0;
@@ -1340,41 +1165,15 @@
     }
 }
 
-@keyframes sd-wave {
-    0%, 100% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(15deg);
-    }
-
-    75% {
-        transform: rotate(-15deg);
-    }
-}
-
 @keyframes sd-spin {
     to {
         transform: rotate(360deg);
     }
 }
 
-@keyframes sd-pulse {
-    0%, 100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-
-/* Mobile Devices (< 576px) */
 @media (max-width: 575px) {
     .sd-container {
         padding: 16px;
@@ -1387,10 +1186,6 @@
         .sd-container .sd-page-title {
             font-size: 20px;
         }
-
-            .sd-container .sd-page-title i {
-                font-size: 24px;
-            }
 
         .sd-container .sd-stats-value {
             font-size: 24px;
@@ -1406,17 +1201,12 @@
             flex-direction: column;
         }
 
-            .sd-container .sd-quick-requests button {
-                width: 100%;
-            }
-
         .sd-container .sd-camera-preview,
         .sd-container .sd-upload-preview {
             height: 200px;
         }
 }
 
-/* Tablet Portrait (576px - 767px) */
 @media (min-width: 576px) and (max-width: 767px) {
     .sd-container .sd-stats-card {
         flex-direction: column;
@@ -1424,7 +1214,6 @@
     }
 }
 
-/* Mobile & Tablet - Stack columns */
 @media (max-width: 767px) {
     .sd-container .col-6,
     .sd-container .col-md-3,
@@ -1433,24 +1222,14 @@
     .sd-container .col-md-8 {
         width: 100%;
     }
-
-        .sd-container .col-6:nth-child(odd) {
-            width: 50%;
-        }
-
-        .sd-container .col-6:nth-child(even) {
-            width: 50%;
-        }
 }
 
-/* Tablet Landscape (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
     .sd-container {
         padding: 20px;
     }
 }
 
-/* Desktop - Stack large columns on tablets */
 @media (max-width: 1023px) {
     .sd-container .col-lg-4,
     .sd-container .col-lg-8 {
@@ -1458,7 +1237,6 @@
     }
 }
 
-/* Large Desktop (> 1400px) */
 @media (min-width: 1400px) {
     .sd-container {
         max-width: 1800px;
@@ -1468,8 +1246,6 @@
 /* ========================================
    MODAL SYSTEM
    ======================================== */
-
-/* Modal Backdrop */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -1480,15 +1256,6 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-    .modal-backdrop.fade {
-        opacity: 0;
-    }
-
-    .modal-backdrop.show {
-        opacity: 1;
-    }
-
-/* Modal Container */
 .modal {
     display: none;
     position: fixed;
@@ -1501,30 +1268,15 @@
     outline: 0;
 }
 
-    .modal.fade {
-        transition: opacity 0.15s linear;
-    }
-
-        .modal.fade .modal-dialog {
-            transition: transform 0.3s ease-out;
-            transform: translate(0, -50px);
-        }
-
     .modal.show {
         display: block;
     }
 
-        .modal.show .modal-dialog {
-            transform: none;
-        }
-
-/* Modal Dialog */
 .modal-dialog {
     position: relative;
     width: auto;
     max-width: 500px;
     margin: 1.75rem auto;
-    pointer-events: none;
 }
 
 .modal-dialog-centered {
@@ -1533,320 +1285,83 @@
     min-height: calc(100% - 3.5rem);
 }
 
-/* Modal Content */
 .modal-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    pointer-events: auto;
-    background-color: var(--sd-white);
-    background-clip: padding-box;
-    border: 1px solid var(--sd-gray-300);
-    border-radius: var(--sd-radius-lg);
-    outline: 0;
-    box-shadow: var(--sd-shadow-lg);
-    animation: sd-modalSlideIn 0.3s ease-out;
+    background: var(--sd-bg-primary);
+    border: 1px solid var(--sd-border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px var(--sd-shadow-lg);
+    transition: all 0.3s ease;
 }
 
-@keyframes sd-modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-50px) scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* Modal Header */
 .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--sd-border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--sd-gray-200);
-    border-top-left-radius: var(--sd-radius-lg);
-    border-top-right-radius: var(--sd-radius-lg);
 }
 
-    .modal-header.bg-warning {
-        background: linear-gradient(135deg, var(--sd-warning), #ffe066);
-        color: #663c00;
-        border-bottom: none;
-    }
-
-    .modal-header.bg-info {
-        background: linear-gradient(135deg, var(--sd-info), #a5d8ff);
-        color: #004085;
-        border-bottom: none;
-    }
-
-    .modal-header.bg-danger {
-        background: linear-gradient(135deg, var(--sd-danger), #ff8787);
-        color: white;
-        border-bottom: none;
-    }
-
     .modal-header .modal-title {
-        margin: 0;
-        line-height: 1.5;
         font-size: 18px;
         font-weight: 700;
+        color: var(--sd-text-primary);
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    /* Close Button */
     .modal-header .btn-close {
-        padding: 0.5rem;
-        margin: -0.5rem -0.5rem -0.5rem auto;
         background: transparent;
         border: 0;
-        border-radius: var(--sd-radius-sm);
-        opacity: 0.5;
-        cursor: pointer;
         font-size: 1.5rem;
-        line-height: 1;
-        transition: opacity 0.2s;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
     }
 
         .modal-header .btn-close:hover {
             opacity: 1;
         }
 
-    .modal-header .btn-close-white {
-        filter: invert(1) grayscale(100%) brightness(200%);
-    }
-
-/* Modal Body */
 .modal-body {
-    position: relative;
-    flex: 1 1 auto;
-    padding: 1.5rem;
+    padding: 20px;
     max-height: 70vh;
     overflow-y: auto;
 }
 
-    .modal-body::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .modal-body::-webkit-scrollbar-track {
-        background: var(--sd-gray-100);
-    }
-
-    .modal-body::-webkit-scrollbar-thumb {
-        background: var(--sd-gray-400);
-        border-radius: 3px;
-    }
-
-        .modal-body::-webkit-scrollbar-thumb:hover {
-            background: var(--sd-primary);
-        }
-
-    /* Modal Body - Alert */
-    .modal-body .alert {
-        padding: 16px;
-        border-radius: var(--sd-radius-sm);
-        margin-bottom: 16px;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        font-size: 14px;
-    }
-
-        .modal-body .alert i {
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-    .modal-body .alert-info {
-        background: var(--sd-info-light);
-        color: #1864ab;
-        border-left: 4px solid var(--sd-info);
-    }
-
-    .modal-body .alert-warning {
-        background: var(--sd-warning-light);
-        color: #e67700;
-        border-left: 4px solid var(--sd-warning);
-    }
-
-    /* Modal Body - Form Elements */
-    .modal-body .mb-3 {
-        margin-bottom: 1rem;
-    }
-
-    .modal-body .form-label {
-        display: inline-block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--sd-dark);
-    }
-
-    .modal-body .form-control,
-    .modal-body .form-select {
-        display: block;
-        width: 100%;
-        padding: 0.75rem;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.5;
-        color: var(--sd-dark);
-        background-color: var(--sd-white);
-        background-clip: padding-box;
-        border: 2px solid var(--sd-gray-300);
-        border-radius: var(--sd-radius-sm);
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-        .modal-body .form-control:focus,
-        .modal-body .form-select:focus {
-            color: var(--sd-dark);
-            background-color: var(--sd-white);
-            border-color: var(--sd-primary);
-            outline: 0;
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
-        }
-
-    .modal-body .form-select {
-        padding-right: 2.25rem;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 16px 12px;
-        appearance: none;
-    }
-
-    .modal-body textarea.form-control {
-        resize: vertical;
-        min-height: 80px;
-    }
-
-    .modal-body small.text-muted {
-        font-size: 12px;
-        color: var(--sd-text-muted);
-        display: block;
-        margin-top: 0.25rem;
-    }
-
-    /* Modal Body - Row Layout */
-    .modal-body .row {
-        display: flex;
-        flex-wrap: wrap;
-        margin: 0 -0.5rem;
-    }
-
-    .modal-body .col-md-6 {
-        padding: 0 0.5rem;
-        width: 100%;
-    }
-
-@media (min-width: 768px) {
-    .modal-body .col-md-6 {
-        width: 50%;
-    }
-}
-
-/* Modal Footer */
 .modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--sd-border-color);
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     justify-content: flex-end;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid var(--sd-gray-200);
-    border-bottom-right-radius: var(--sd-radius-lg);
-    border-bottom-left-radius: var(--sd-radius-lg);
     gap: 8px;
 }
 
-    /* Modal Footer - Buttons */
     .modal-footer .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: var(--sd-radius-sm);
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--sd-transition-normal);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-        text-decoration: none;
+        padding: 10px 20px;
+        font-size: 14px;
     }
 
-        .modal-footer .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--sd-shadow-md);
-        }
+/* Modal Specific Colors */
+#overtimeModal .modal-header {
+    background: linear-gradient(135deg, var(--sd-warning) 0%, var(--sd-golden) 100%);
+    color: var(--sd-navy);
+}
 
-        .modal-footer .btn:active {
-            transform: translateY(0);
-        }
+#leaveModal .modal-header {
+    background: linear-gradient(135deg, var(--sd-info) 0%, var(--sd-clay) 100%);
+    color: white;
+}
 
-    .modal-footer .btn-secondary {
-        background: var(--sd-gray-300);
-        color: var(--sd-dark);
-    }
+#lateModal .modal-header {
+    background: linear-gradient(135deg, var(--sd-danger) 0%, var(--sd-terracotta) 100%);
+    color: white;
+}
 
-        .modal-footer .btn-secondary:hover {
-            background: var(--sd-gray-400);
-        }
-
-    .modal-footer .btn-warning {
-        background: linear-gradient(135deg, var(--sd-warning), #ffe066);
-        color: #663c00;
-    }
-
-        .modal-footer .btn-warning:hover {
-            filter: brightness(1.1);
-        }
-
-    .modal-footer .btn-info {
-        background: linear-gradient(135deg, var(--sd-info), #a5d8ff);
-        color: #004085;
-    }
-
-        .modal-footer .btn-info:hover {
-            filter: brightness(1.1);
-        }
-
-    .modal-footer .btn-danger {
-        background: linear-gradient(135deg, var(--sd-danger), #ff8787);
-        color: white;
-    }
-
-        .modal-footer .btn-danger:hover {
-            filter: brightness(1.1);
-        }
-
-/* Modal - Responsive */
 @media (max-width: 575px) {
     .modal-dialog {
-        margin: 0.5rem;
         max-width: calc(100% - 1rem);
+        margin: 0.5rem;
     }
-
-    .modal-dialog-centered {
-        min-height: calc(100% - 1rem);
-    }
-
-    .modal-header,
-    .modal-body,
-    .modal-footer {
-        padding: 1rem;
-    }
-
-        .modal-body .col-md-6 {
-            width: 100%;
-        }
 
     .modal-footer {
         flex-direction: column;
@@ -1855,61 +1370,4 @@
         .modal-footer .btn {
             width: 100%;
         }
-}
-
-@media (min-width: 576px) {
-    .modal-dialog {
-        max-width: 500px;
-    }
-}
-
-/* ========================================
-   MODAL SPECIFIC STYLING
-   ======================================== */
-
-/* Overtime Modal */
-#overtimeModal .modal-header {
-    background: linear-gradient(135deg, var(--sd-warning), #ffe066);
-}
-
-#overtimeModal .modal-title {
-    color: #663c00;
-}
-
-/* Leave Modal */
-#leaveModal .modal-header {
-    background: linear-gradient(135deg, var(--sd-info), #a5d8ff);
-}
-
-#leaveModal .modal-title {
-    color: #004085;
-}
-
-/* Late Modal */
-#lateModal .modal-header {
-    background: linear-gradient(135deg, var(--sd-danger), #ff8787);
-}
-
-#lateModal .modal-title {
-    color: white;
-}
-
-/* Modal Animation on Open */
-.modal.fade:not(.show) {
-    opacity: 0;
-}
-
-.modal.show {
-    opacity: 1;
-}
-
-/* Prevent body scroll when modal is open */
-body.modal-open {
-    overflow: hidden;
-}
-
-/* Modal Open State Helper */
-.modal-open .modal {
-    overflow-x: hidden;
-    overflow-y: auto;
 }

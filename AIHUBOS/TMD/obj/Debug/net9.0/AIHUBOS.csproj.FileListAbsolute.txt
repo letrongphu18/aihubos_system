@@ -163,7 +163,6 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\scopedcs
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\scopedcss\bundle\AIHUBOS.styles.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\scopedcss\projectbundle\AIHUBOS.bundle.scp.css
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\eskoez1yyi-e4w56dvxfl.gz
-E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\w9mlggnmxw-dfnppdl3g8.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\4wm3wi3wwe-gl1mxqsys7.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\dqmiss43dz-de8vj1xrxy.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\pczmp7oq7t-27wjx5xml5.gz
@@ -175,15 +174,12 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compress
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\5tta4hgo05-m2ia7jhuea.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\ck3c3wus6b-exal3e8soo.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\gyds8p5cqg-cxws24jv0r.gz
-E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\sd1zf4ixch-9dopasi6un.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\emdptu4f85-evotqgixij.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\trg33b1agf-4ishzg9lt8.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\flh3bsr6rr-02ubtmj9cn.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\j764x8kfdf-t2zf1ouknv.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\f04kbd6k7m-eh932k34cg.gz
-E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\wga7b2qo23-ngic8tlq1f.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\xopc7v79j3-b9sayid5wm.gz
-E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\rt1c57h2t9-p5wlhbetdt.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\u3ut1dgr5x-pj9ptxu7cg.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\9ti669iht6-h8vuedi179.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\9pi3yc89kp-bgkv99jvqm.gz
@@ -280,3 +276,7 @@ E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compress
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\q1wxl7duqc-8a6br9tizf.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\gy89k4vuwd-qtx5d36gl4.gz
 E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\1uygj771xo-vj05kwz942.gz
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\wga7b2qo23-qh24l88lrr.gz
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\sd1zf4ixch-9dopasi6un.gz
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\rt1c57h2t9-9vw5iwujvh.gz
+E:\AIHUB TASK\AIHUBCHAMCONG\aihubos_system\AIHUBOS\TMD\obj\Debug\net9.0\compressed\w9mlggnmxw-03gdu1kawi.gz

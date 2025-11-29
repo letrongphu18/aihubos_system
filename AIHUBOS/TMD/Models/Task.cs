@@ -13,8 +13,6 @@ public partial class Task
 
     public string? Platform { get; set; }
 
-    public int? TargetPerWeek { get; set; }
-
     public bool? IsActive { get; set; }
 
     public DateTime? CreatedAt { get; set; }

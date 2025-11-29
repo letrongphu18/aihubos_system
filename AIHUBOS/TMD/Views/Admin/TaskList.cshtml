@@ -22,20 +22,12 @@
         </div>
     </div>
 
-    <!-- Statistics Cards -->
+    <!-- ✅ STATISTICS CARDS - CẬP NHẬT THEO TRẠNG THÁI MỚI -->
     <div class="tl-stats-grid">
-        <div class="tl-stats-card tl-stats-primary">
-            <div class="tl-stats-icon"><i class="fas fa-tasks"></i></div>
-            <div class="tl-stats-content">
-                <div class="tl-stats-label">Tổng Task</div>
-                <div class="tl-stats-value">@ViewBag.TotalTasks</div>
-            </div>
-        </div>
-
-        <div class="tl-stats-card tl-stats-info">
+        <div class="tl-stats-card tl-stats-secondary">
             <div class="tl-stats-icon"><i class="fas fa-inbox"></i></div>
             <div class="tl-stats-content">
-                <div class="tl-stats-label">Chưa bắt đầu</div>
+                <div class="tl-stats-label">TODO</div>
                 <div class="tl-stats-value">@ViewBag.TodoTasks</div>
             </div>
         </div>
@@ -48,6 +40,14 @@
             </div>
         </div>
 
+        <div class="tl-stats-card tl-stats-info">
+            <div class="tl-stats-icon"><i class="fas fa-vial"></i></div>
+            <div class="tl-stats-content">
+                <div class="tl-stats-label">Chờ test</div>
+                <div class="tl-stats-value">@ViewBag.TestingTasks</div>
+            </div>
+        </div>
+
         <div class="tl-stats-card tl-stats-success">
             <div class="tl-stats-icon"><i class="fas fa-check-circle"></i></div>
             <div class="tl-stats-content">
@@ -56,6 +56,22 @@
             </div>
             <div class="tl-stats-trend">
                 <span class="tl-completion-rate">@ViewBag.TaskCompletionRate%</span>
+            </div>
+        </div>
+
+        <div class="tl-stats-card tl-stats-danger">
+            <div class="tl-stats-icon"><i class="fas fa-redo"></i></div>
+            <div class="tl-stats-content">
+                <div class="tl-stats-label">Reopen</div>
+                <div class="tl-stats-value">@ViewBag.ReopenTasks</div>
+            </div>
+        </div>
+
+        <div class="tl-stats-card tl-stats-primary">
+            <div class="tl-stats-icon"><i class="fas fa-tasks"></i></div>
+            <div class="tl-stats-content">
+                <div class="tl-stats-label">Tổng tasks</div>
+                <div class="tl-stats-value">@ViewBag.TotalTasks</div>
             </div>
         </div>
     </div>
@@ -84,7 +100,7 @@
                         @foreach (var task in Model)
                         {
                             var totalAssigned = task.UserTasks.Count;
-                            var completedCount = task.UserTasks.Count(ut => ut.Status == "Completed");
+                            var completedCount = task.UserTasks.Count(ut => ut.Status == "Done");
                             var isTaskCompleted = totalAssigned > 0 && completedCount == totalAssigned;
                             var isOverdue = task.Deadline.HasValue && !isTaskCompleted && DateTime.Now > task.Deadline.Value;
                             var rowClass = isOverdue ? "tl-row-overdue" : "";
@@ -166,8 +182,20 @@
                                                 {
                                                     "TODO" => "secondary",
                                                     "InProgress" => "warning",
-                                                    "Completed" => "success",
+                                                    "Testing" => "info",
+                                                    "Done" => "success",
+                                                    "Reopen" => "danger",
                                                     _ => "secondary"
+                                                };
+
+                                                var statusText = ut.Status switch
+                                                {
+                                                    "TODO" => "Chưa bắt đầu",
+                                                    "InProgress" => "Đang làm",
+                                                    "Testing" => "Chờ test",
+                                                    "Done" => "Hoàn thành",
+                                                    "Reopen" => "Reopen",
+                                                    _ => "Chưa bắt đầu"
                                                 };
 
                                                 <div class="tl-user-status-item">
@@ -194,7 +222,7 @@
                                                         <span class="tl-user-name">@ut.User.FullName</span>
                                                     </div>
                                                     <span class="tl-badge tl-badge-@statusClass tl-badge-sm">
-                                                        @(ut.Status switch { "TODO" => "Chưa bắt đầu", "InProgress" => "Đang làm", "Completed" => "Hoàn thành", _ => "Chưa bắt đầu" })
+                                                        @statusText
                                                     </span>
                                                 </div>
                                             }
@@ -328,7 +356,7 @@
                 }, 4000);
             }
 
-            // HÀM viewTaskDetail FULL
+            // ✅ HÀM viewTaskDetail FIXED - BỎ CompletedThisWeek & TargetPerWeek
             function viewTaskDetail(taskId) {
                 const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
                 const content = document.getElementById('taskDetailContent');
@@ -351,7 +379,9 @@
                         if (t.AssignedUsers && t.AssignedUsers.length > 0) {
                             usersHTML = t.AssignedUsers.map(u => {
                                 const statusBg = u.StatusClass === 'success' ? 'bg-success' :
-                                                 u.StatusClass === 'warning' ? 'bg-warning' : 'bg-secondary';
+                                                 u.StatusClass === 'warning' ? 'bg-warning' :
+                                                 u.StatusClass === 'info' ? 'bg-info' :
+                                                 u.StatusClass === 'danger' ? 'bg-danger' : 'bg-secondary';
 
                                 let avatarHTML = '';
                                 if (u.Avatar && u.Avatar !== '/images/default-avatar.png') {
@@ -389,9 +419,6 @@
                                             <span class="badge ${statusBg}">${u.StatusText || 'N/A'}</span>
                                         </td>
                                         <td>
-                                            ${u.CompletedThisWeek ?? 0}
-                                        </td>
-                                        <td>
                                             ${u.ReportLink ? `<a href="${u.ReportLink}" target="_blank" class="link-primary text-decoration-none"><i class="fas fa-external-link-alt"></i> Xem</a>` : '<span class="text-muted">—</span>'}
                                         </td>
                                         <td>
@@ -401,7 +428,7 @@
                                 `;
                             }).join('');
                         } else {
-                            usersHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Chưa có người được giao</td></tr>';
+                            usersHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Chưa có người được giao</td></tr>';
                         }
 
                         content.innerHTML = `
@@ -437,16 +464,22 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div>
-                                                <small class="text-muted d-block mb-1"><i class="fas fa-bullseye me-1"></i>Target/Week</small>
-                                                <strong>${t.TargetPerWeek || '—'}</strong>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div>
                                                 <small class="text-muted d-block mb-1"><i class="fas fa-info-circle me-1"></i>Thời gian</small>
                                                 <small class="text-muted">
                                                     Tạo: ${t.CreatedAtStr || 'N/A'}<br>
                                                     Cập nhật: ${t.UpdatedAtStr || 'N/A'}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div>
+                                                <small class="text-muted d-block mb-1"><i class="fas fa-chart-pie me-1"></i>Statistics</small>
+                                                <small>
+                                                    TODO: ${t.TodoCount || 0} |
+                                                    Đang làm: ${t.InProgressCount || 0} |
+                                                    Testing: ${t.TestingCount || 0}<br>
+                                                    Done: ${t.DoneCount || 0} |
+                                                    Reopen: ${t.ReopenCount || 0}
                                                 </small>
                                             </div>
                                         </div>
@@ -461,7 +494,6 @@
                                                 <tr>
                                                     <th>Người làm</th>
                                                     <th>Trạng thái</th>
-                                                    <th>Hoàn thành tuần</th>
                                                     <th>Báo cáo</th>
                                                     <th>Cập nhật</th>
                                                 </tr>

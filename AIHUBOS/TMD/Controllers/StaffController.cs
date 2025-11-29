@@ -568,7 +568,7 @@ namespace AIHUBOS.Controllers
 			return View(myTasks);
 		}
 		[HttpPost]
-		public async System.Threading.Tasks.Task<IActionResult> UpdateTaskProgress([FromBody] UpdateTaskProgressRequest request)
+		public async Task<IActionResult> UpdateTaskProgress([FromBody] UpdateTaskProgressRequest request)
 		{
 			if (!IsAuthenticated())
 				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
@@ -583,15 +583,60 @@ namespace AIHUBOS.Controllers
 			if (userTask == null)
 				return Json(new { success = false, message = "Không tìm thấy công việc" });
 
-			if (!new[] { "TODO", "InProgress", "Completed" }.Contains(request.Status))
+			// ✅ VALIDATE STATUS
+			var validStatuses = new[] { "TODO", "InProgress", "Testing", "Done", "Reopen" };
+			if (!validStatuses.Contains(request.Status))
 				return Json(new { success = false, message = "Trạng thái không hợp lệ" });
+
+			var currentStatus = userTask.Status ?? "TODO";
+			var newStatus = request.Status;
+
+			// ✅ VALIDATE TRANSITION - CHỈ CHO PHÉP THEO FLOW
+			bool isValidTransition = (currentStatus, newStatus) switch
+			{
+				("TODO", "InProgress") => true,           // Bắt đầu làm
+				("TODO", "TODO") => true,                 // Stay TODO
+				("InProgress", "InProgress") => true,     // Stay InProgress
+				("InProgress", "Testing") => true,        // Gửi test
+				("Reopen", "InProgress") => true,         // Sửa lại sau khi reopen
+				("Testing", _) => false,                  // KHÔNG CHO DEV THAY ĐỔI (chỉ Tester)
+				("Done", _) => false,                     // KHÔNG CHO THAY ĐỔI
+				_ => false
+			};
+
+			if (!isValidTransition)
+			{
+				var errorMessage = currentStatus switch
+				{
+					"Testing" => "Task đang chờ Tester kiểm tra. Bạn không thể thay đổi trạng thái.",
+					"Done" => "Task đã hoàn thành. Không thể thay đổi trạng thái.",
+					_ => $"Không thể chuyển từ '{currentStatus}' sang '{newStatus}'"
+				};
+
+				return Json(new { success = false, message = errorMessage });
+			}
+
+			// ✅ VALIDATE URL FORMAT (CHỈ KHI CÓ NHẬP)
+			//if (!string.IsNullOrWhiteSpace(request.ReportLink))
+			//{
+			//	var reportLink = request.ReportLink.Trim();
+			//	if (!Uri.TryCreate(reportLink, UriKind.Absolute, out var uriResult)
+			//		|| (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+			//	{
+			//		return Json(new
+			//		{
+			//			success = false,
+			//			message = "⚠️ Link báo cáo không hợp lệ.\n\nVui lòng nhập URL đầy đủ (bắt đầu bằng http:// hoặc https://)"
+			//		});
+			//	}
+			//}
 
 			try
 			{
 				var oldData = new { userTask.Status, userTask.ReportLink };
 
 				userTask.Status = request.Status;
-				userTask.ReportLink = request.ReportLink;
+				//userTask.ReportLink = string.IsNullOrWhiteSpace(request.ReportLink) ? null : request.ReportLink.Trim();
 				userTask.UpdatedAt = DateTime.Now;
 
 				await _context.SaveChangesAsync();
@@ -605,34 +650,73 @@ namespace AIHUBOS.Controllers
 					userTask.UserTaskId,
 					oldData,
 					newData,
-					$"Cập nhật trạng thái công việc: {userTask.Task.TaskName}",
+					$"Cập nhật trạng thái: {userTask.Task.TaskName}",
 					new Dictionary<string, object>
 					{
 				{ "TaskName", userTask.Task.TaskName },
 				{ "OldStatus", oldData.Status ?? "NULL" },
-				{ "NewStatus", newData.Status }
+				{ "NewStatus", newData.Status },
+				{ "ReportLink", newData.ReportLink ?? "NULL" }
 					}
 				);
 
-				// GỬI THÔNG BÁO CHO ADMIN KHI HOÀN THÀNH
-				if (request.Status == "Completed")
+				// ✅ GỬI THÔNG BÁO KHI CHUYỂN SANG TESTING
+				if (request.Status == "Testing")
 				{
-					// ✅ ĐÚNG
+					var reportInfo = !string.IsNullOrEmpty(userTask.ReportLink)
+						? $"\n\n📎 Report: {userTask.ReportLink}"
+						: "";
+
+					// Gửi cho Admin
 					await _notificationService.SendToAdminsAsync(
-						"Task hoàn thành",
-						$"{userTask.User.FullName} đã hoàn thành: {userTask.Task.TaskName}",
-						"success",
-						$"/Admin/TaskList"
+						"Task chờ test",
+						$"{userTask.User.FullName} đã hoàn thành task: {userTask.Task.TaskName}. Cần Tester kiểm tra.{reportInfo}",
+						"info",
+						"/Admin/TaskList"
 					);
+
+					// Gửi cho Tester (role = "Tester" HOẶC IsTester = true)
+					var testers = await _context.Users
+						.Include(u => u.Role)
+						.Where(u => (u.Role.RoleName == "Tester" || u.IsTester) && u.IsActive == true)
+						.ToListAsync();
+
+					foreach (var tester in testers)
+					{
+						await _notificationService.SendToUserAsync(
+							tester.UserId,
+							"Task mới cần test",
+							$"Task '{userTask.Task.TaskName}' từ {userTask.User.FullName} cần được test.{reportInfo}",
+							"info",
+							"/Tester/Dashboard"
+						);
+					}
 				}
 
-				return Json(new { success = true, message = "Cập nhật trạng thái thành công!" });
+				var successMessage = newStatus switch
+				{
+					"InProgress" => "✅ Đã chuyển sang trạng thái 'Đang làm'",
+					"Testing" => "✅ Đã gửi task cho Tester kiểm tra\n\nTester sẽ nhận được thông báo ngay!",
+					_ => "✅ Cập nhật trạng thái thành công!"
+				};
+
+				return Json(new { success = true, message = successMessage });
 			}
 			catch (Exception ex)
 			{
+				await _auditHelper.LogFailedAttemptAsync(
+					userId,
+					"UPDATE",
+					"UserTask",
+					$"Exception: {ex.Message}",
+					new { UserTaskId = request.UserTaskId, Error = ex.ToString() }
+				);
+
 				return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
 			}
 		}
+
+
 
 		// ============================================
 		// CHECK-IN / CHECK-OUT với UPLOAD ẢNH
@@ -938,35 +1022,27 @@ namespace AIHUBOS.Controllers
 					{
 						var task = ut.Task;
 
-						// ✅ XÁC ĐỊNH TRẠNG THÁI
-						string status;
-						if (ut.CompletedThisWeek == null || ut.CompletedThisWeek == 0)
-							status = "TODO";
-						else if (ut.CompletedThisWeek < task.TargetPerWeek)
-							status = "InProgress";
-						else
-							status = "Completed";
+						// ✅ XÁC ĐỊNH TRẠNG THÁI - KHÔNG CÒN SỬ DỤNG CompletedThisWeek/TargetPerWeek
+						string status = ut.Status ?? "TODO";
 
-						// ✅ LOGIC KIỂM TRA QUÁ HẠN - FIXED
+						// ✅ LOGIC KIỂM TRA QUÁ HẠN
 						var isOverdue = false;
 						var isCompletedLate = false;
 
 						if (task.Deadline.HasValue)
 						{
-							if (status == "Completed")
+							if (status == "Done" || status == "Completed")
 							{
 								// Đã hoàn thành - kiểm tra hoàn thành trước hay sau deadline
 								if (ut.UpdatedAt.HasValue && ut.UpdatedAt.Value > task.Deadline.Value)
 								{
-									// Hoàn thành SAU deadline = HOÀN THÀNH MUỘN
 									isCompletedLate = true;
-									isOverdue = true; // Vẫn đánh dấu overdue để thống kê
+									isOverdue = true;
 								}
-								// Nếu hoàn thành TRƯỚC deadline = OK, không overdue
 							}
 							else
 							{
-								// Chưa hoàn thành và đã quá deadline = ĐANG QUÁ HẠN
+								// Chưa hoàn thành và đã quá deadline
 								if (DateTime.Now > task.Deadline.Value)
 								{
 									isOverdue = true;
@@ -980,8 +1056,6 @@ namespace AIHUBOS.Controllers
 							taskName = task.TaskName,
 							description = task.Description ?? "",
 							platform = task.Platform ?? "",
-							targetPerWeek = task.TargetPerWeek ?? 0,
-							completedThisWeek = ut.CompletedThisWeek ?? 0,
 							reportLink = ut.ReportLink ?? "",
 							deadline = task.Deadline.HasValue ? task.Deadline.Value.ToString("dd/MM/yyyy") : "",
 							priority = task.Priority ?? "Medium",
@@ -998,7 +1072,7 @@ namespace AIHUBOS.Controllers
 					success = true,
 					tasks = tasksSummary,
 					totalTasks = tasksSummary.Count,
-					completedTasks = tasksSummary.Count(t => t.status == "Completed"),
+					completedTasks = tasksSummary.Count(t => t.status == "Completed" || t.status == "Done"),
 					inProgressTasks = tasksSummary.Count(t => t.status == "InProgress"),
 					overdueTasks = tasksSummary.Count(t => t.isOverdue)
 				});
@@ -1019,7 +1093,7 @@ namespace AIHUBOS.Controllers
 
 
 		[HttpGet]
-		public async System.Threading.Tasks.Task<IActionResult> GetTaskDetail(int userTaskId)
+		public async Task<IActionResult> GetTaskDetail(int userTaskId)
 		{
 			if (!IsAuthenticated())
 				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
@@ -1033,9 +1107,7 @@ namespace AIHUBOS.Controllers
 					.FirstOrDefaultAsync(ut => ut.UserTaskId == userTaskId && ut.UserId == userId);
 
 				if (userTask == null)
-				{
 					return Json(new { success = false, message = "Không tìm thấy công việc" });
-				}
 
 				await _auditHelper.LogViewAsync(
 					userId.Value,
@@ -1046,12 +1118,14 @@ namespace AIHUBOS.Controllers
 
 				var task = userTask.Task;
 
-				// ✅ XÁC ĐỊNH TRẠNG THÁI HIỂN THỊ
+				// ✅ XÁC ĐỊNH TRẠNG THÁI THEO FLOW MỚI
 				string statusText = userTask.Status switch
 				{
 					"TODO" => "Chưa bắt đầu",
 					"InProgress" => "Đang làm",
-					"Completed" => "Hoàn thành",
+					"Testing" => "Chờ test",
+					"Done" => "Hoàn thành",
+					"Reopen" => "Cần sửa lại",
 					_ => "Chưa bắt đầu"
 				};
 
@@ -1059,7 +1133,9 @@ namespace AIHUBOS.Controllers
 				{
 					"TODO" => "secondary",
 					"InProgress" => "warning",
-					"Completed" => "success",
+					"Testing" => "info",
+					"Done" => "success",
+					"Reopen" => "danger",
 					_ => "secondary"
 				};
 
@@ -1067,7 +1143,9 @@ namespace AIHUBOS.Controllers
 				{
 					"TODO" => "inbox",
 					"InProgress" => "spinner fa-spin",
-					"Completed" => "check-circle",
+					"Testing" => "vial",
+					"Done" => "check-circle",
+					"Reopen" => "redo",
 					_ => "inbox"
 				};
 
@@ -1077,9 +1155,8 @@ namespace AIHUBOS.Controllers
 
 				if (task.Deadline.HasValue)
 				{
-					if (userTask.Status == "Completed")
+					if (userTask.Status == "Done")
 					{
-						// Hoàn thành muộn?
 						if (userTask.UpdatedAt.HasValue && userTask.UpdatedAt.Value > task.Deadline.Value)
 						{
 							isCompletedLate = true;
@@ -1087,9 +1164,8 @@ namespace AIHUBOS.Controllers
 							statusClass = "warning";
 						}
 					}
-					else
+					else if (userTask.Status != "Done")
 					{
-						// Đang quá hạn?
 						if (DateTime.Now > task.Deadline.Value)
 						{
 							isOverdue = true;
@@ -1110,7 +1186,7 @@ namespace AIHUBOS.Controllers
 						reportLink = userTask.ReportLink ?? "",
 						deadline = task.Deadline.HasValue ? task.Deadline.Value.ToString("dd/MM/yyyy HH:mm") : "Không có deadline",
 						priority = task.Priority ?? "Medium",
-						status = userTask.Status,
+						status = userTask.Status ?? "TODO",
 						statusText = statusText,
 						statusClass = statusClass,
 						statusIcon = statusIcon,
@@ -2094,8 +2170,7 @@ namespace AIHUBOS.Controllers
 		public class UpdateTaskProgressRequest
 		{
 			public int UserTaskId { get; set; }
-			public string Status { get; set; } = "TODO"; // ✅ THAY ĐỔI Ở ĐÂY
-			public string? ReportLink { get; set; }
+			public string Status { get; set; } = "TODO";
 		}
 		public class CheckOutRequest
 		{

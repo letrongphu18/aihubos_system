@@ -388,6 +388,7 @@ namespace AIHUBOS.Controllers
 		}
 
 		// POST: Login - JSON Response
+		// POST: Login - JSON Response
 		[HttpPost]
 		public async Task<IActionResult> LoginJson([FromBody] LoginViewModel model)
 		{
@@ -397,7 +398,6 @@ namespace AIHUBOS.Controllers
 					.SelectMany(v => v.Errors)
 					.Select(e => e.ErrorMessage));
 
-				// ✅ LOG: Invalid model state
 				await _auditHelper.LogFailedAttemptAsync(
 					null,
 					"LOGIN",
@@ -419,7 +419,6 @@ namespace AIHUBOS.Controllers
 			{
 				await LogLoginHistory(null, model.Username, false, "Tên đăng nhập không tồn tại");
 
-				// ✅ LOG: Username not found
 				await _auditHelper.LogFailedAttemptAsync(
 					null,
 					"LOGIN",
@@ -441,7 +440,6 @@ namespace AIHUBOS.Controllers
 			{
 				await LogLoginHistory(user.UserId, model.Username, false, "Sai mật khẩu");
 
-				// ✅ LOG: Wrong password
 				await _auditHelper.LogFailedAttemptAsync(
 					user.UserId,
 					"LOGIN",
@@ -462,7 +460,6 @@ namespace AIHUBOS.Controllers
 			{
 				await LogLoginHistory(user.UserId, model.Username, false, "Tài khoản đã bị khóa");
 
-				// ✅ LOG: Account locked
 				await _auditHelper.LogFailedAttemptAsync(
 					user.UserId,
 					"LOGIN",
@@ -474,12 +471,19 @@ namespace AIHUBOS.Controllers
 				return Json(new { success = false, message = "Tài khoản đã bị khóa. Vui lòng liên hệ Admin" });
 			}
 
-			// Success - Set session
+			// ✅ SUCCESS - SET SESSION
 			HttpContext.Session.SetInt32("UserId", user.UserId);
 			HttpContext.Session.SetString("Username", user.Username);
 			HttpContext.Session.SetString("FullName", user.FullName);
 			HttpContext.Session.SetString("RoleName", user.Role.RoleName);
 			HttpContext.Session.SetString("Avatar", user.Avatar ?? "/images/default-avatar.png");
+
+			// ⭐⭐⭐ CRITICAL: THÊM DÒNG NÀY ⭐⭐⭐
+			HttpContext.Session.SetString("IsTester", user.IsTester ? "1" : "0");
+
+			// ✅ NẾU CÓ DEPARTMENT
+			if (user.DepartmentId.HasValue)
+				HttpContext.Session.SetInt32("DepartmentId", user.DepartmentId.Value);
 
 			// Update last login
 			user.LastLoginAt = DateTime.Now;
@@ -488,7 +492,6 @@ namespace AIHUBOS.Controllers
 			// Log successful login
 			await LogLoginHistory(user.UserId, user.Username, true, null);
 
-			// ✅ LOG: Successful login với nhiều thông tin hơn
 			await _auditHelper.LogDetailedAsync(
 				user.UserId,
 				"LOGIN",
@@ -496,22 +499,33 @@ namespace AIHUBOS.Controllers
 				user.UserId,
 				null,
 				null,
-				$"Đăng nhập thành công - Role: {user.Role.RoleName}",
+				$"Đăng nhập thành công - Role: {user.Role.RoleName}" + (user.IsTester ? " (Tester)" : ""),
 				new Dictionary<string, object>
 				{
-					{ "Browser", GetBrowserName(Request.Headers["User-Agent"].ToString()) },
-					{ "Device", GetDeviceType(Request.Headers["User-Agent"].ToString()) },
-					{ "IP", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown" },
-					{ "LoginTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
+			{ "Browser", GetBrowserName(Request.Headers["User-Agent"].ToString()) },
+			{ "Device", GetDeviceType(Request.Headers["User-Agent"].ToString()) },
+			{ "IP", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown" },
+			{ "LoginTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
+			{ "IsTester", user.IsTester } // ✅ LOG IsTester
 				}
 			);
 
-			// ✅ REDIRECT THEO ROLE
-			string redirectUrl = user.Role.RoleName == "Admin"
-				? "/Admin/Dashboard"
-				: "/Staff/Dashboard";
+			// ✅ REDIRECT THEO ROLE VÀ IsTester
+			string redirectUrl;
 
-			return Json(new { success = true, message = "Đăng nhập thành công!", redirectUrl = redirectUrl });
+			if (user.Role.RoleName == "Admin")
+				redirectUrl = "/Admin/Dashboard";
+			else if (user.Role.RoleName == "Tester" || user.IsTester)
+				redirectUrl = "/Staff/Dashboard"; // ✅ Staff có IsTester=1 → Tester Dashboard
+			else
+				redirectUrl = "/Staff/Dashboard";
+
+			return Json(new
+			{
+				success = true,
+				message = "Đăng nhập thành công!",
+				redirectUrl = redirectUrl
+			});
 		}
 
 		// GET: Register - ADMIN ONLY
@@ -543,7 +557,6 @@ namespace AIHUBOS.Controllers
 
 			if (roleName != "Admin")
 			{
-				// ✅ LOG: Unauthorized attempt
 				await _auditHelper.LogFailedAttemptAsync(
 					adminId,
 					"CREATE",
@@ -561,7 +574,6 @@ namespace AIHUBOS.Controllers
 					.SelectMany(v => v.Errors)
 					.Select(e => e.ErrorMessage));
 
-				// ✅ LOG: Invalid data
 				await _auditHelper.LogFailedAttemptAsync(
 					adminId,
 					"CREATE",
@@ -576,7 +588,6 @@ namespace AIHUBOS.Controllers
 			// Check username exists
 			if (await _context.Users.AnyAsync(u => u.Username == model.Username))
 			{
-				// ✅ LOG: Duplicate username
 				await _auditHelper.LogFailedAttemptAsync(
 					adminId,
 					"CREATE",
@@ -592,7 +603,6 @@ namespace AIHUBOS.Controllers
 			if (!string.IsNullOrEmpty(model.Email) &&
 				await _context.Users.AnyAsync(u => u.Email == model.Email))
 			{
-				// ✅ LOG: Duplicate email
 				await _auditHelper.LogFailedAttemptAsync(
 					adminId,
 					"CREATE",
@@ -608,7 +618,6 @@ namespace AIHUBOS.Controllers
 			var selectedRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleId == model.RoleId);
 			if (selectedRole == null)
 			{
-				// ✅ LOG: Invalid role
 				await _auditHelper.LogFailedAttemptAsync(
 					adminId,
 					"CREATE",
@@ -622,6 +631,10 @@ namespace AIHUBOS.Controllers
 
 			try
 			{
+				// ✅ TỰ ĐỘNG SET IsTester = true NẾU ROLE LÀ "Tester" hoặc "Staff"
+				bool isTester = selectedRole.RoleName == "Tester" ||
+								(selectedRole.RoleName == "Staff" && (model.IsTester ?? false));
+
 				// Create new user
 				var user = new User
 				{
@@ -632,6 +645,7 @@ namespace AIHUBOS.Controllers
 					PhoneNumber = model.PhoneNumber,
 					DepartmentId = model.DepartmentId,
 					RoleId = selectedRole.RoleId,
+					IsTester = isTester, // ✅ THÊM FIELD NÀY
 					IsActive = true,
 					CreatedAt = DateTime.Now,
 					CreatedBy = HttpContext.Session.GetInt32("UserId")
@@ -640,7 +654,7 @@ namespace AIHUBOS.Controllers
 				_context.Users.Add(user);
 				await _context.SaveChangesAsync();
 
-				// ✅ LOG: Successful creation với đầy đủ thông tin
+				// ✅ LOG với thông tin IsTester
 				await _auditHelper.LogDetailedAsync(
 					adminId,
 					"CREATE",
@@ -654,26 +668,29 @@ namespace AIHUBOS.Controllers
 						user.Email,
 						user.PhoneNumber,
 						RoleName = selectedRole.RoleName,
-						DepartmentId = user.DepartmentId
+						DepartmentId = user.DepartmentId,
+						IsTester = user.IsTester // ✅ LOG IsTester
 					},
-					$"Admin tạo tài khoản mới: {user.Username} ({user.FullName}) với role {selectedRole.RoleName}",
+					$"Admin tạo tài khoản mới: {user.Username} ({user.FullName}) với role {selectedRole.RoleName}" +
+					(user.IsTester ? " (Tester)" : ""),
 					new Dictionary<string, object>
 					{
-						{ "CreatedBy", HttpContext.Session.GetString("FullName") ?? "Admin" },
-						{ "CreatedAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
+				{ "CreatedBy", HttpContext.Session.GetString("FullName") ?? "Admin" },
+				{ "CreatedAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
+				{ "IsTester", user.IsTester }
 					}
 				);
 
 				return Json(new
 				{
 					success = true,
-					message = $"Tạo tài khoản thành công cho {user.FullName}!",
+					message = $"Tạo tài khoản thành công cho {user.FullName}!" +
+							  (user.IsTester ? " (Quyền Tester đã được cấp)" : ""),
 					redirectUrl = "/Admin/UserList"
 				});
 			}
 			catch (Exception ex)
 			{
-				// ✅ LOG: Exception
 				await _auditHelper.LogFailedAttemptAsync(
 					adminId,
 					"CREATE",

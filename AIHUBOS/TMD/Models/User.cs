@@ -33,11 +33,15 @@ public partial class User
 
     public DateTime? UpdatedAt { get; set; }
 
+    public bool IsTester { get; set; }
+
     public virtual ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual Department? Department { get; set; }
+
+    public virtual ICollection<Kpihistory> Kpihistories { get; set; } = new List<Kpihistory>();
 
     public virtual ICollection<LateRequest> LateRequestReviewedByNavigations { get; set; } = new List<LateRequest>();
 
@@ -86,9 +90,8 @@ public partial class User
     public virtual UserSalarySetting? UserSalarySettingUser { get; set; }
 
     public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
-	public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
-	public virtual ICollection<WorkScheduleException> WorkScheduleExceptionCreatedByNavigations { get; set; } = new List<WorkScheduleException>();
+    public virtual ICollection<WorkScheduleException> WorkScheduleExceptionCreatedByNavigations { get; set; } = new List<WorkScheduleException>();
 
     public virtual ICollection<WorkScheduleException> WorkScheduleExceptionUsers { get; set; } = new List<WorkScheduleException>();
 }

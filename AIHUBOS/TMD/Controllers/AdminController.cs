@@ -45,6 +45,10 @@ namespace AIHUBOS.Controllers
 		// ============================================
 		// ADMIN DASHBOARD - ĐÃ ĐƯỢC TỐI ƯU HÓA
 		// ============================================
+		// ============================================
+		// ADMIN DASHBOARD - HOÀN CHỈNH SAU KHI XÓA 3 CỘT
+		// TargetPerWeek, CompletedThisWeek, WeekStartDate
+		// ============================================
 		public async Task<IActionResult> Dashboard()
 		{
 			if (!IsAdmin())
@@ -55,7 +59,7 @@ namespace AIHUBOS.Controllers
 			ViewBag.ActiveUsers = await _context.Users.CountAsync(u => u.IsActive == true);
 			ViewBag.TotalDepartments = await _context.Departments.CountAsync();
 
-			// ========== TASK STATISTICS (DỰA VÀO STATUS) ==========
+			// ========== TASK STATISTICS (DỰA VÀO STATUS MỚI) ==========
 			var allTasks = await _context.Tasks
 				.Include(t => t.UserTasks)
 				.Where(t => t.IsActive == true)
@@ -66,16 +70,18 @@ namespace AIHUBOS.Controllers
 			ViewBag.TotalTasks = allTasks.Count;
 			ViewBag.TotalAssignments = allUserTasks.Count;
 
-			// Đếm theo Status
-			ViewBag.TodoTasks = allUserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO");
+			// Đếm theo Status MỚI (TODO, InProgress, Testing, Done, Reopen)
+			ViewBag.TodoTasks = allUserTasks.Count(ut => ut.Status == "TODO");
 			ViewBag.InProgressTasks = allUserTasks.Count(ut => ut.Status == "InProgress");
-			ViewBag.CompletedTasks = allUserTasks.Count(ut => ut.Status == "Completed");
+			ViewBag.TestingTasks = allUserTasks.Count(ut => ut.Status == "Testing");
+			ViewBag.CompletedTasks = allUserTasks.Count(ut => ut.Status == "Done");
+			ViewBag.ReopenTasks = allUserTasks.Count(ut => ut.Status == "Reopen");
 
 			// Task quá hạn (task chưa hoàn thành và deadline < now)
 			ViewBag.OverdueTasks = allTasks.Count(t =>
 				t.Deadline.HasValue &&
 				t.Deadline.Value < DateTime.Now &&
-				t.UserTasks.Any(ut => ut.Status != "Completed")
+				t.UserTasks.Any(ut => ut.Status != "Done")
 			);
 
 			// Tỷ lệ hoàn thành (theo assignments)
@@ -109,7 +115,7 @@ namespace AIHUBOS.Controllers
 				.Select(u => new
 				{
 					User = u,
-					TotalCompleted = u.UserTasks.Count(ut => ut.Status == "Completed" && ut.Task.IsActive == true),
+					TotalCompleted = u.UserTasks.Count(ut => ut.Status == "Done" && ut.Task.IsActive == true),
 					TotalTasks = u.UserTasks.Count(ut => ut.Task.IsActive == true),
 					Avatar = string.IsNullOrEmpty(u.Avatar) || u.Avatar == "/images/default-avatar.png" ? null : u.Avatar,
 					Initials = u.FullName != null ? u.FullName.Substring(0, 1).ToUpper() : "U",
@@ -171,23 +177,25 @@ namespace AIHUBOS.Controllers
 
 			ViewBag.PunctualStaff = punctualStaff;
 
-			// ========== TASKS BY PRIORITY (THEO STATUS COMPLETED) ==========
+			// ========== TASKS BY PRIORITY (THEO STATUS MỚI) ==========
 			var tasksByPriority = allTasks
 				.GroupBy(t => t.Priority ?? "Medium")
 				.Select(g => new
 				{
 					Priority = g.Key,
 					Total = g.Sum(t => t.UserTasks.Count),
-					Completed = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "Completed")),
+					Completed = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "Done")),
 					InProgress = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "InProgress")),
-					Todo = g.Sum(t => t.UserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO"))
+					Testing = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "Testing")),
+					Todo = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "TODO")),
+					Reopen = g.Sum(t => t.UserTasks.Count(ut => ut.Status == "Reopen"))
 				})
 				.OrderBy(x => x.Priority == "High" ? 1 : x.Priority == "Medium" ? 2 : 3)
 				.ToList();
 
 			ViewBag.TasksByPriority = tasksByPriority;
 
-			// ========== UPCOMING TASKS (THEO STATUS) ==========
+			// ========== UPCOMING TASKS (THEO STATUS MỚI) ==========
 			var upcomingTasksData = await _context.Tasks
 				.Include(t => t.UserTasks)
 					.ThenInclude(ut => ut.User)
@@ -200,11 +208,13 @@ namespace AIHUBOS.Controllers
 			{
 				Task = t,
 				AssignedCount = t.UserTasks.Count,
-				CompletedCount = t.UserTasks.Count(ut => ut.Status == "Completed"),
+				CompletedCount = t.UserTasks.Count(ut => ut.Status == "Done"),
 				InProgressCount = t.UserTasks.Count(ut => ut.Status == "InProgress"),
-				TodoCount = t.UserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO"),
+				TestingCount = t.UserTasks.Count(ut => ut.Status == "Testing"),
+				TodoCount = t.UserTasks.Count(ut => ut.Status == "TODO"),
+				ReopenCount = t.UserTasks.Count(ut => ut.Status == "Reopen"),
 				ProgressPercent = t.UserTasks.Count > 0
-					? Math.Round((double)t.UserTasks.Count(ut => ut.Status == "Completed") / t.UserTasks.Count * 100, 1)
+					? Math.Round((double)t.UserTasks.Count(ut => ut.Status == "Done") / t.UserTasks.Count * 100, 1)
 					: 0
 			}).ToList();
 
@@ -213,8 +223,14 @@ namespace AIHUBOS.Controllers
 			// ========== TASK STATUS DISTRIBUTION (CHO CHART) ==========
 			ViewBag.TaskStatusData = new
 			{
-				Labels = new[] { "Chưa bắt đầu", "Đang làm", "Hoàn thành" },
-				Data = new[] { ViewBag.TodoTasks, ViewBag.InProgressTasks, ViewBag.CompletedTasks }
+				Labels = new[] { "TODO", "Đang làm", "Chờ test", "Hoàn thành", "Reopen" },
+				Data = new[] {
+			ViewBag.TodoTasks,
+			ViewBag.InProgressTasks,
+			ViewBag.TestingTasks,
+			ViewBag.CompletedTasks,
+			ViewBag.ReopenTasks
+		}
 			};
 
 			// ========== DEPARTMENT PERFORMANCE (CHO CHART) ==========
@@ -228,7 +244,7 @@ namespace AIHUBOS.Controllers
 						.Count(ut => ut.Task.IsActive == true),
 					CompletedTasks = d.Users
 						.SelectMany(u => u.UserTasks)
-						.Count(ut => ut.Status == "Completed" && ut.Task.IsActive == true)
+						.Count(ut => ut.Status == "Done" && ut.Task.IsActive == true)
 				})
 				.Where(x => x.TotalTasks > 0)
 				.OrderByDescending(x => x.CompletedTasks)
@@ -332,6 +348,9 @@ namespace AIHUBOS.Controllers
 				return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
 			}
 		}
+
+
+
 		// ============================================
 		// GET USER DETAIL - Full info (FIXED)
 		// ============================================
@@ -1387,6 +1406,9 @@ namespace AIHUBOS.Controllers
 		// ============================================
 		// TASK MANAGEMENT - CRUD
 		// ============================================
+		// ============================================
+		// TASK MANAGEMENT - CRUD (FIXED)
+		// ============================================
 		public async Task<IActionResult> TaskList()
 		{
 			if (!IsAdmin())
@@ -1403,24 +1425,26 @@ namespace AIHUBOS.Controllers
 			ViewBag.ActiveTasks = tasks.Count(t => t.IsActive == true);
 			ViewBag.InactiveTasks = tasks.Count(t => t.IsActive == false);
 
-			// ✅ THỐNG KÊ THEO STATUS CỦA USER TASKS
+			// ✅ THỐNG KÊ THEO STATUS MỚI
 			var allUserTasks = tasks.SelectMany(t => t.UserTasks).ToList();
 
-			ViewBag.TodoTasks = allUserTasks.Count(ut => string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO");
+			ViewBag.TodoTasks = allUserTasks.Count(ut => ut.Status == "TODO");
 			ViewBag.InProgressTasks = allUserTasks.Count(ut => ut.Status == "InProgress");
-			ViewBag.CompletedTasks = allUserTasks.Count(ut => ut.Status == "Completed");
+			ViewBag.TestingTasks = allUserTasks.Count(ut => ut.Status == "Testing");
+			ViewBag.CompletedTasks = allUserTasks.Count(ut => ut.Status == "Done");
+			ViewBag.ReopenTasks = allUserTasks.Count(ut => ut.Status == "Reopen");
 
-			// ✅ TASKS QUÁ HẠN: Chỉ task ĐANG HOẠT ĐỘNG và CHƯA HOÀN THÀNH
+			// ✅ TASKS QUÁ HẠN
 			ViewBag.OverdueTasks = tasks.Count(t =>
 				t.IsActive == true &&
 				t.Deadline.HasValue &&
 				t.Deadline.Value < DateTime.Now &&
-				t.UserTasks.Any(ut => ut.Status != "Completed")
+				t.UserTasks.Any(ut => ut.Status != "Done")
 			);
 
-			// ✅ COMPLETION RATE (theo Completed status)
+			// ✅ COMPLETION RATE (theo Done status)
 			var totalAssignments = allUserTasks.Count;
-			var completedAssignments = allUserTasks.Count(ut => ut.Status == "Completed");
+			var completedAssignments = allUserTasks.Count(ut => ut.Status == "Done");
 
 			ViewBag.TaskCompletionRate = totalAssignments > 0
 				? Math.Round((double)completedAssignments / totalAssignments * 100, 1)
@@ -1497,6 +1521,7 @@ namespace AIHUBOS.Controllers
 					Platform = request.Platform?.Trim(),
 					Deadline = request.Deadline,
 					Priority = request.Priority ?? "Medium",
+					// ❌ TargetPerWeek = request.TargetPerWeek, // REMOVED
 					IsActive = true,
 					CreatedAt = DateTime.Now,
 					UpdatedAt = DateTime.Now
@@ -1521,8 +1546,7 @@ namespace AIHUBOS.Controllers
 						};
 						_context.UserTasks.Add(userTask);
 
-						// ✅ GỬI THÔNG BÁO CHO TỪNG USER
-						// ✅ ĐÚNG
+						// GỬI THÔNG BÁO
 						await _notificationService.SendToUserAsync(
 							userId,
 							"Nhiệm vụ mới",
@@ -1570,6 +1594,7 @@ namespace AIHUBOS.Controllers
 			}
 		}
 
+
 		[HttpGet]
 		public async Task<IActionResult> EditTask(int id)
 		{
@@ -1608,7 +1633,6 @@ namespace AIHUBOS.Controllers
 					"Không có quyền cập nhật",
 					new { TaskId = request.TaskId }
 				);
-
 				return Json(new { success = false, message = "Không có quyền thực hiện!" });
 			}
 
@@ -1621,12 +1645,12 @@ namespace AIHUBOS.Controllers
 					"Tên task rỗng",
 					new { TaskId = request.TaskId }
 				);
-
 				return Json(new { success = false, message = "Tên task không được để trống!" });
 			}
 
 			var task = await _context.Tasks
 				.Include(t => t.UserTasks)
+					.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(t => t.TaskId == request.TaskId);
 
 			if (task == null)
@@ -1638,7 +1662,6 @@ namespace AIHUBOS.Controllers
 					"Task không tồn tại",
 					new { TaskId = request.TaskId }
 				);
-
 				return Json(new { success = false, message = "Không tìm thấy task!" });
 			}
 
@@ -1655,24 +1678,23 @@ namespace AIHUBOS.Controllers
 					task.Priority
 				};
 
+				var oldAssignments = task.UserTasks.ToList();
+				var oldUserIds = oldAssignments.Select(ut => ut.UserId).ToList();
+				var newUserIds = request.AssignedUserIds ?? new List<int>();
+
+				// CẬP NHẬT THÔNG TIN TASK
 				task.TaskName = request.TaskName.Trim();
 				task.Description = request.Description?.Trim();
 				task.Platform = request.Platform?.Trim();
 				task.Deadline = request.Deadline;
 				task.Priority = request.Priority ?? "Medium";
+				// ❌ task.TargetPerWeek = request.TargetPerWeek; // REMOVED
 				task.UpdatedAt = DateTime.Now;
 
-				// ✅ CẬP NHẬT ASSIGNMENTS
-				var oldAssignments = task.UserTasks.ToList();
-				var oldUserIds = oldAssignments.Select(ut => ut.UserId).ToList();
-				var newUserIds = request.AssignedUserIds ?? new List<int>();
-
-				// Xóa user không còn được assign
+				// XỬ LÝ XÓA USER
 				var toRemove = oldAssignments.Where(ut => !newUserIds.Contains(ut.UserId)).ToList();
 				foreach (var ut in toRemove)
 				{
-					// ✅ THÔNG BÁO CHO USER BỊ XÓA
-					// ✅ ĐÚNG
 					await _notificationService.SendToUserAsync(
 						ut.UserId,
 						"Task đã bị gỡ",
@@ -1683,7 +1705,7 @@ namespace AIHUBOS.Controllers
 				}
 				_context.UserTasks.RemoveRange(toRemove);
 
-				// Thêm user mới
+				// XỬ LÝ THÊM USER MỚI
 				var toAdd = newUserIds.Where(uid => !oldUserIds.Contains(uid)).ToList();
 				foreach (var userId in toAdd)
 				{
@@ -1697,8 +1719,6 @@ namespace AIHUBOS.Controllers
 					};
 					_context.UserTasks.Add(userTask);
 
-					// ✅ THÔNG BÁO CHO USER MỚI
-					// ✅ ĐÚNG
 					await _notificationService.SendToUserAsync(
 						userId,
 						"Task mới được giao",
@@ -1706,6 +1726,29 @@ namespace AIHUBOS.Controllers
 						"info",
 						"/Staff/MyTasks"
 					);
+				}
+
+				// THÔNG BÁO CHO USER ĐÃ TỒN TẠI (nếu task info thay đổi)
+				bool taskInfoChanged =
+					oldValues.TaskName != task.TaskName ||
+					oldValues.Description != task.Description ||
+					oldValues.Platform != task.Platform ||
+					oldValues.Deadline != task.Deadline ||
+					oldValues.Priority != task.Priority;
+
+				if (taskInfoChanged)
+				{
+					var remainingUserIds = oldUserIds.Intersect(newUserIds).ToList();
+					foreach (var userId in remainingUserIds)
+					{
+						await _notificationService.SendToUserAsync(
+							userId,
+							"Task đã được cập nhật",
+							$"Task '{task.TaskName}' vừa được cập nhật thông tin",
+							"info",
+							"/Staff/MyTasks"
+						);
+					}
 				}
 
 				await _context.SaveChangesAsync();
@@ -1897,71 +1940,125 @@ namespace AIHUBOS.Controllers
 		// ✅ GET TASK DETAILS - ĐƠNGIẢN & ĐẦY ĐỦ
 		// ============================================
 		[HttpGet]
-		public async Task<IActionResult> GetTaskDetails(int id)
+		public async System.Threading.Tasks.Task<IActionResult> GetTaskDetail(int userTaskId)
 		{
 			if (!IsAdmin())
-				return Json(new { success = false, message = "Không có quyền truy cập!" });
+				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
+
+			var userId = HttpContext.Session.GetInt32("UserId");
 
 			try
 			{
-				var task = await _context.Tasks
-					.Include(t => t.UserTasks)
-						.ThenInclude(ut => ut.User)
-							.ThenInclude(u => u.Department)
-					.FirstOrDefaultAsync(t => t.TaskId == id);
+				var userTask = await _context.UserTasks
+					.Include(ut => ut.Task)
+					.FirstOrDefaultAsync(ut => ut.UserTaskId == userTaskId && ut.UserId == userId);
 
-				if (task == null)
-					return Json(new { success = false, message = "Không tìm thấy task!" });
+				if (userTask == null)
+				{
+					return Json(new { success = false, message = "Không tìm thấy công việc" });
+				}
 
-				// ✅ MAP USER TASKS ĐẦY ĐỦ THÔNG TIN
-				var assignedUsers = task.UserTasks
-					.Select(ut => new
+				await _auditHelper.LogViewAsync(
+					userId.Value,
+					"UserTask",
+					userTaskId,
+					$"Xem chi tiết: {userTask.Task.TaskName}"
+				);
+
+				var task = userTask.Task;
+
+				// ✅ XÁC ĐỊNH TRẠNG THÁI HIỂN THỊ
+				string statusText = userTask.Status switch
+				{
+					"TODO" => "Chưa bắt đầu",
+					"InProgress" => "Đang làm",
+					"Testing" => "Chờ test",
+					"Done" => "Hoàn thành",
+					"Reopen" => "Reopen",
+					_ => "Chưa bắt đầu"
+				};
+
+				string statusClass = userTask.Status switch
+				{
+					"TODO" => "secondary",
+					"InProgress" => "warning",
+					"Testing" => "info",
+					"Done" => "success",
+					"Reopen" => "danger",
+					_ => "secondary"
+				};
+
+				string statusIcon = userTask.Status switch
+				{
+					"TODO" => "inbox",
+					"InProgress" => "spinner fa-spin",
+					"Testing" => "vial",
+					"Done" => "check-circle",
+					"Reopen" => "redo",
+					_ => "inbox"
+				};
+
+				// ✅ KIỂM TRA QUÁ HẠN
+				bool isOverdue = false;
+				bool isCompletedLate = false;
+
+				if (task.Deadline.HasValue)
+				{
+					if (userTask.Status == "Done")
 					{
-						ut.UserTaskId,
-						ut.UserId,
-						ut.TaskId,
-						ut.CompletedThisWeek,
-						ut.ReportLink,
-						ut.WeekStartDate,
-						ut.Status,
-						ut.CreatedAt,
-						ut.UpdatedAt,
-						FullName = ut.User?.FullName ?? "N/A",
-						Avatar = ut.User?.Avatar ?? "",
-						DepartmentName = ut.User?.Department?.DepartmentName ?? "N/A",
-						StatusText = string.IsNullOrEmpty(ut.Status) || ut.Status == "TODO" ? "Chưa bắt đầu" :
-									 ut.Status == "InProgress" ? "Đang làm" : "Hoàn thành",
-						StatusClass = ut.Status == "Completed" ? "success" :
-									  ut.Status == "InProgress" ? "warning" : "secondary",
-						CreatedAtStr = ut.CreatedAt.HasValue ? ut.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "N/A",
-						UpdatedAtStr = ut.UpdatedAt.HasValue ? ut.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "N/A"
-					})
-					.OrderBy(u => u.FullName)
-					.ToList();
+						// Hoàn thành muộn?
+						if (userTask.UpdatedAt.HasValue && userTask.UpdatedAt.Value > task.Deadline.Value)
+						{
+							isCompletedLate = true;
+							statusText = "Hoàn thành muộn";
+							statusClass = "warning";
+						}
+					}
+					else
+					{
+						// Đang quá hạn?
+						if (DateTime.Now > task.Deadline.Value)
+						{
+							isOverdue = true;
+						}
+					}
+				}
 
-				// ✅ BUILD RESPONSE ĐƠN GIẢN NHƯNG ĐẦY ĐỦ
 				return Json(new
 				{
 					success = true,
 					task = new
 					{
-						task.TaskId,
-						task.TaskName,
-						task.Description,
-						task.Platform,
-						task.TargetPerWeek,
-						task.Priority,
-						task.IsActive,
-						DeadlineStr = task.Deadline.HasValue ? task.Deadline.Value.ToString("dd/MM/yyyy HH:mm") : null,
-						CreatedAtStr = task.CreatedAt.HasValue ? task.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "N/A",
-						UpdatedAtStr = task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "N/A",
-						AssignedUsers = assignedUsers
+						userTaskId = userTask.UserTaskId,
+						taskId = task.TaskId,
+						taskName = task.TaskName,
+						description = task.Description ?? "Không có mô tả",
+						platform = task.Platform ?? "N/A",
+						reportLink = userTask.ReportLink ?? "",
+						deadline = task.Deadline.HasValue ? task.Deadline.Value.ToString("dd/MM/yyyy HH:mm") : "Không có deadline",
+						priority = task.Priority ?? "Medium",
+						status = userTask.Status,
+						statusText = statusText,
+						statusClass = statusClass,
+						statusIcon = statusIcon,
+						isOverdue = isOverdue,
+						isCompletedLate = isCompletedLate,
+						createdAt = userTask.CreatedAt.HasValue ? userTask.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "",
+						updatedAt = userTask.UpdatedAt.HasValue ? userTask.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa cập nhật"
 					}
 				});
 			}
 			catch (Exception ex)
 			{
-				return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+				await _auditHelper.LogFailedAttemptAsync(
+					userId,
+					"VIEW",
+					"UserTask",
+					$"Exception: {ex.Message}",
+					new { UserTaskId = userTaskId, Error = ex.ToString() }
+				);
+
+				return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
 			}
 		}
 		// ============================================
@@ -3009,6 +3106,285 @@ namespace AIHUBOS.Controllers
 				return Json(new { success = false, message = ex.Message });
 			}
 		}
+
+		[HttpGet]
+		public IActionResult KPIDashboard()
+		{
+			// Kiểm tra quyền admin
+			if (HttpContext.Session.GetString("RoleName") != "Admin")
+			{
+				return RedirectToAction("Login", "Account");
+			}
+
+			return View();
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetDepartmentComparison(DateTime startDate, DateTime endDate)
+		{
+			try
+			{
+				// Gọi stored procedure sp_CompareDepartmentKPI
+				var result = await _context.Database
+					.SqlQueryRaw<DepartmentKPIDto>(
+						"EXEC sp_CompareDepartmentKPI @StartDate, @EndDate",
+						new Microsoft.Data.SqlClient.SqlParameter("@StartDate", startDate),
+						new Microsoft.Data.SqlClient.SqlParameter("@EndDate", endDate)
+					)
+					.ToListAsync();
+
+				return Json(result);
+			}
+			catch (Exception ex)
+			{
+				return Json(new { error = ex.Message });
+			}
+		}
+
+
+		[HttpGet]
+		public async Task<IActionResult> EditUser(int id)
+		{
+			if (!IsAdmin())
+				return RedirectToAction("Login", "Account");
+
+			var user = await _context.Users
+				.Include(u => u.Role)
+				.Include(u => u.Department)
+				.FirstOrDefaultAsync(u => u.UserId == id);
+
+			if (user == null)
+				return NotFound();
+
+			ViewBag.Departments = await _context.Departments
+				.Where(d => d.IsActive == true)
+				.OrderBy(d => d.DepartmentName)
+				.ToListAsync();
+
+			ViewBag.Roles = await _context.Roles
+				.OrderBy(r => r.RoleName)
+				.ToListAsync();
+
+			return View(user);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> UpdateUserJson([FromBody] UpdateUserRequest request)
+		{
+			if (!IsAdmin())
+			{
+				await _auditHelper.LogFailedAttemptAsync(
+					HttpContext.Session.GetInt32("UserId"),
+					"UPDATE",
+					"User",
+					"Không có quyền cập nhật",
+					new { UserId = request.UserId }
+				);
+
+				return Json(new { success = false, message = "Chỉ Admin mới có quyền cập nhật tài khoản!" });
+			}
+
+			var adminId = HttpContext.Session.GetInt32("UserId");
+
+			if (string.IsNullOrWhiteSpace(request.FullName))
+			{
+				return Json(new { success = false, message = "Họ tên không được để trống!" });
+			}
+
+			var user = await _context.Users
+				.Include(u => u.Role)
+				.FirstOrDefaultAsync(u => u.UserId == request.UserId);
+
+			if (user == null)
+			{
+				await _auditHelper.LogFailedAttemptAsync(
+					adminId,
+					"UPDATE",
+					"User",
+					"User không tồn tại",
+					new { UserId = request.UserId }
+				);
+
+				return Json(new { success = false, message = "Không tìm thấy người dùng" });
+			}
+
+			// Check email exists (excluding current user)
+			if (!string.IsNullOrEmpty(request.Email))
+			{
+				var emailExists = await _context.Users
+					.AnyAsync(u => u.Email == request.Email && u.UserId != request.UserId);
+
+				if (emailExists)
+				{
+					await _auditHelper.LogFailedAttemptAsync(
+						adminId,
+						"UPDATE",
+						"User",
+						"Email đã được sử dụng",
+						new { Email = request.Email }
+					);
+
+					return Json(new { success = false, message = "Email đã được sử dụng bởi người dùng khác" });
+				}
+			}
+
+			try
+			{
+				var oldData = new
+				{
+					user.FullName,
+					user.Email,
+					user.PhoneNumber,
+					user.DepartmentId,
+					user.RoleId,
+					RoleName = user.Role?.RoleName,
+					user.IsTester,
+					user.IsActive
+				};
+
+				// ✅ CẬP NHẬT THÔNG TIN USER
+				user.FullName = request.FullName.Trim();
+				user.Email = request.Email?.Trim();
+				user.PhoneNumber = request.PhoneNumber?.Trim();
+				user.DepartmentId = request.DepartmentId;
+				user.RoleId = request.RoleId;
+
+				// ✅ CẬP NHẬT IsTester
+				// Nếu role là Tester → tự động set IsTester = true
+				// Nếu role là Staff → lấy từ request
+				// Nếu role khác → set IsTester = false
+				var newRole = await _context.Roles.FindAsync(request.RoleId);
+				if (newRole != null)
+				{
+					if (newRole.RoleName == "Tester")
+					{
+						user.IsTester = true;
+					}
+					else if (newRole.RoleName == "Staff")
+					{
+						user.IsTester = request.IsTester ?? false;
+					}
+					else
+					{
+						user.IsTester = false;
+					}
+				}
+
+				user.IsActive = request.IsActive;
+				user.UpdatedAt = DateTime.Now;
+
+				await _context.SaveChangesAsync();
+
+				var newData = new
+				{
+					user.FullName,
+					user.Email,
+					user.PhoneNumber,
+					user.DepartmentId,
+					user.RoleId,
+					RoleName = newRole?.RoleName,
+					user.IsTester,
+					user.IsActive
+				};
+
+				await _auditHelper.LogDetailedAsync(
+					adminId,
+					"UPDATE",
+					"User",
+					user.UserId,
+					oldData,
+					newData,
+					$"Cập nhật thông tin user: {user.Username} ({user.FullName})",
+					new Dictionary<string, object>
+					{
+				{ "ChangedFields", GetChangedFields(oldData, newData) },
+				{ "UpdatedAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
+				{ "IsTester", user.IsTester }
+					}
+				);
+
+				return Json(new
+				{
+					success = true,
+					message = $"Cập nhật thông tin {user.FullName} thành công!" +
+							  (user.IsTester ? " (Quyền Tester đã được cấp)" : "")
+				});
+			}
+			catch (Exception ex)
+			{
+				await _auditHelper.LogFailedAttemptAsync(
+					adminId,
+					"UPDATE",
+					"User",
+					$"Exception: {ex.Message}",
+					new { UserId = request.UserId, Error = ex.ToString() }
+				);
+
+				return Json(new
+				{
+					success = false,
+					message = $"Có lỗi xảy ra: {ex.Message}"
+				});
+			}
+		}
+
+		// ============================================
+		// 📋 HELPER METHOD
+		// ============================================
+		private string GetChangedFields(object oldData, object newData)
+		{
+			var changes = new List<string>();
+			var oldProps = oldData.GetType().GetProperties();
+			var newProps = newData.GetType().GetProperties();
+
+			foreach (var oldProp in oldProps)
+			{
+				var newProp = newProps.FirstOrDefault(p => p.Name == oldProp.Name);
+				if (newProp != null)
+				{
+					var oldVal = oldProp.GetValue(oldData)?.ToString() ?? "";
+					var newVal = newProp.GetValue(newData)?.ToString() ?? "";
+
+					if (oldVal != newVal)
+					{
+						changes.Add($"{oldProp.Name}: '{oldVal}' → '{newVal}'");
+					}
+				}
+			}
+
+			return changes.Count > 0 ? string.Join(", ", changes) : "No changes";
+		}
+		public class UpdateUserRequest
+		{
+			public int UserId { get; set; }
+			public string FullName { get; set; } = string.Empty;
+			public string? Email { get; set; }
+			public string? PhoneNumber { get; set; }
+			public int? DepartmentId { get; set; }
+			public int RoleId { get; set; }
+			public bool? IsTester { get; set; } // ✅ THÊM FIELD NÀY
+			public bool IsActive { get; set; }
+		}
+
+		// DTO class để map kết quả từ stored procedure
+		public class DepartmentKPIDto
+		{
+			public int DepartmentId { get; set; }
+			public string DepartmentName { get; set; } = string.Empty;
+			public int TotalEmployees { get; set; }
+			public int TotalAttendances { get; set; }
+			public double AvgAttendancePerEmployee { get; set; }
+			public int TotalLateDays { get; set; }
+			public double LateRate { get; set; }
+			public decimal TotalWorkHours { get; set; }
+			public decimal AvgHoursPerDay { get; set; }
+			public decimal TotalOvertimeHours { get; set; }
+			public int TotalTasks { get; set; }
+			public int CompletedTasks { get; set; }
+			public double TaskCompletionRate { get; set; }
+			public double DepartmentKPIScore { get; set; }
+		}
+
 		public class ReviewRequestViewModel
 		{
 			public string RequestType { get; set; } = string.Empty;
@@ -3061,7 +3437,6 @@ namespace AIHUBOS.Controllers
 			public string TaskName { get; set; } = string.Empty;
 			public string? Description { get; set; }
 			public string? Platform { get; set; }
-			public int TargetPerWeek { get; set; }
 			public DateTime? Deadline { get; set; }
 			public string? Priority { get; set; }
 			public List<int>? AssignedUserIds { get; set; }
@@ -3073,7 +3448,6 @@ namespace AIHUBOS.Controllers
 			public string TaskName { get; set; } = string.Empty;
 			public string? Description { get; set; }
 			public string? Platform { get; set; }
-			public int TargetPerWeek { get; set; }
 			public DateTime? Deadline { get; set; }
 			public string? Priority { get; set; }
 			public List<int>? AssignedUserIds { get; set; }

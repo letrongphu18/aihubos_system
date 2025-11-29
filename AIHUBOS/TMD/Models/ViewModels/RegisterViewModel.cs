@@ -46,5 +46,9 @@ namespace AIHUBOS.Models.ViewModels
 
 		[Required(ErrorMessage = "Vui lòng chọn vai trò")]
 		public int RoleId { get; set; }
+
+		// ✅ THÊM PROPERTY MỚI
+		[Display(Name = "Quyền Tester")]
+		public bool? IsTester { get; set; }
 	}
 }

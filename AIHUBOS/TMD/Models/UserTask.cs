@@ -11,11 +11,7 @@ public partial class UserTask
 
     public int TaskId { get; set; }
 
-    public int? CompletedThisWeek { get; set; }
-
     public string? ReportLink { get; set; }
-
-    public DateOnly? WeekStartDate { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

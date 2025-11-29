@@ -34,6 +34,19 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="staff-nav-link" href="/Staff/Dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
                     <li class="nav-item"><a class="staff-nav-link" href="/Staff/MyTasks"><i class="fas fa-clipboard-list"></i><span>Công việc</span></a></li>
+
+                    @* ✅ MENU TESTER - CHỈ HIỂN THỊ NẾU IsTester = "1" *@
+                    @if (Context.Session.GetString("IsTester") == "1")
+                    {
+                        <li class="nav-item">
+                            <a class="staff-nav-link" href="/Tester/Dashboard">
+                                <i class="fas fa-flask"></i>
+                                <span>Task cần test</span>
+                                <span class="badge bg-warning ms-1" id="testingTaskCount" style="display:none;">0</span>
+                            </a>
+                        </li>
+                    }
+
                     <li class="nav-item"><a class="staff-nav-link" href="/Staff/AttendanceHistory"><i class="fas fa-history"></i><span>Lịch sử chấm công</span></a></li>
 
                     <!-- Theme Toggle Button -->
@@ -66,7 +79,14 @@
                             <img src="@Context.Session.GetString("Avatar")" alt="Avatar" class="staff-user-avatar" />
                             <div class="staff-user-info d-none d-lg-block">
                                 <div class="staff-user-name">@Context.Session.GetString("FullName")</div>
-                                <div class="staff-user-role">@Context.Session.GetString("RoleName")</div>
+                                <div class="staff-user-role">
+                                    @Context.Session.GetString("RoleName")
+                                    @* ✅ BADGE TESTER - CHỈ HIỂN THỊ NẾU IsTester = "1" *@
+                                    @if (Context.Session.GetString("IsTester") == "1")
+                                    {
+                                        <span class="badge bg-info ms-1" style="font-size:0.65rem;">Tester</span>
+                                    }
+                                </div>
                             </div>
                             <i class="fas fa-chevron-down"></i>
                         </a>
@@ -303,6 +323,27 @@
             }
         }
 
+        // ✅ CẬP NHẬT SỐ LƯỢNG TASK CẦN TEST (CHỈ DÀNH CHO TESTER)
+        async function updateTestingTaskCount() {
+            // Kiểm tra xem user có phải Tester không
+            const isTester = document.getElementById('testingTaskCount');
+            if (!isTester) return; // Không phải tester thì return
+
+            try {
+                const response = await fetch('/Tester/GetStatistics');
+                const data = await response.json();
+
+                if (data.success && data.stats.totalTesting > 0) {
+                    isTester.textContent = data.stats.totalTesting;
+                    isTester.style.display = 'inline-block';
+                } else {
+                    isTester.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error fetching testing count:', error);
+            }
+        }
+
         // ✅ LOAD KHI TRANG VỪA MỞ
         document.addEventListener('DOMContentLoaded', function() {
             // Load saved theme
@@ -317,6 +358,12 @@
 
             // Load notifications
             loadNotifications();
+
+            // ✅ CẬP NHẬT TASK COUNT CHO TESTER
+            updateTestingTaskCount();
+
+            // Refresh task count mỗi 30 giây
+            setInterval(updateTestingTaskCount, 30000);
         });
     </script>
 
