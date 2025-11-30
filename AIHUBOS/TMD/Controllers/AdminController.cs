@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.SignalR;
 using AIHUBOS.Hubs;
 using AIHUBOS.Services;
+using AIHUBOS.ViewModels;
+
 
 namespace AIHUBOS.Controllers
 {
@@ -49,6 +51,9 @@ namespace AIHUBOS.Controllers
 		// ADMIN DASHBOARD - HOÀN CHỈNH SAU KHI XÓA 3 CỘT
 		// TargetPerWeek, CompletedThisWeek, WeekStartDate
 		// ============================================
+		// ============================================
+		// ADMIN DASHBOARD - ĐÃ FIX HOÀN CHỈNH
+		// ============================================
 		public async Task<IActionResult> Dashboard()
 		{
 			if (!IsAdmin())
@@ -61,9 +66,9 @@ namespace AIHUBOS.Controllers
 
 			// ========== TASK STATISTICS (DỰA VÀO STATUS MỚI) ==========
 			var allTasks = await _context.Tasks
-				.Include(t => t.UserTasks)
-				.Where(t => t.IsActive == true)
-				.ToListAsync();
+	.Include(t => t.UserTasks)  // ✅ GIỮ NGUYÊN (đây là collection, không có vấn đề)
+	.Where(t => t.IsActive == true)
+	.ToListAsync();
 
 			var allUserTasks = allTasks.SelectMany(t => t.UserTasks).ToList();
 
@@ -106,24 +111,24 @@ namespace AIHUBOS.Controllers
 				? Math.Round((double)ViewBag.OnTimeCount / monthlyAttendances.Count * 100, 1)
 				: 0;
 
-			// ========== TOP PERFORMERS (THEO COMPLETED STATUS) ==========
 			var topPerformers = await _context.Users
-				.Include(u => u.Department)
-				.Include(u => u.UserTasks)
-					.ThenInclude(ut => ut.Task)
-				.Where(u => u.IsActive == true && u.UserTasks.Any())
-				.Select(u => new
-				{
-					User = u,
-					TotalCompleted = u.UserTasks.Count(ut => ut.Status == "Done" && ut.Task.IsActive == true),
-					TotalTasks = u.UserTasks.Count(ut => ut.Task.IsActive == true),
-					Avatar = string.IsNullOrEmpty(u.Avatar) || u.Avatar == "/images/default-avatar.png" ? null : u.Avatar,
-					Initials = u.FullName != null ? u.FullName.Substring(0, 1).ToUpper() : "U",
-					HasAvatar = !string.IsNullOrEmpty(u.Avatar) && u.Avatar != "/images/default-avatar.png"
-				})
-				.OrderByDescending(x => x.TotalCompleted)
-				.Take(5)
-				.ToListAsync();
+	.Include(u => u.Department)
+	// ❌ BỎ .Include(u => u.UserTasks)
+	.Where(u => u.IsActive == true)
+	.Select(u => new
+	{
+		User = u,
+		TotalCompleted = _context.UserTasks
+			.Count(ut => ut.UserId == u.UserId && ut.Status == "Done" && ut.Task.IsActive == true),
+		TotalTasks = _context.UserTasks
+			.Count(ut => ut.UserId == u.UserId && ut.Task.IsActive == true),
+		Avatar = string.IsNullOrEmpty(u.Avatar) || u.Avatar == "/images/default-avatar.png" ? null : u.Avatar,
+		Initials = u.FullName != null ? u.FullName.Substring(0, 1).ToUpper() : "U",
+		HasAvatar = !string.IsNullOrEmpty(u.Avatar) && u.Avatar != "/images/default-avatar.png"
+	})
+	.OrderByDescending(x => x.TotalCompleted)
+	.Take(5)
+	.ToListAsync();
 
 			ViewBag.TopPerformers = topPerformers;
 
@@ -267,19 +272,85 @@ namespace AIHUBOS.Controllers
 		// ============================================
 		// USER MANAGEMENT
 		// ============================================
-		public async Task<IActionResult> UserList()
+		public async Task<IActionResult> UserList(
+	int page = 1,
+	int pageSize = 10,
+	string? search = null,
+	string? roleName = null,
+	string? status = null,
+	int? departmentId = null)
 		{
 			if (!IsAdmin())
 				return RedirectToAction("Login", "Account");
 
-			var users = await _context.Users
+			// Lấy roles và departments cho bộ lọc
+			var roles = await _context.Roles.OrderBy(r => r.RoleName).ToListAsync();
+			var departments = await _context.Departments.OrderBy(d => d.DepartmentName).ToListAsync();
+
+			// Query base
+			var query = _context.Users
 				.Include(u => u.Role)
 				.Include(u => u.Department)
+				.AsQueryable();
+
+			// Filters server-side (safe for large datasets)
+			if (!string.IsNullOrWhiteSpace(search))
+			{
+				var s = search.Trim().ToLower();
+				query = query.Where(u =>
+					(u.FullName != null && u.FullName.ToLower().Contains(s)) ||
+					(u.Username != null && u.Username.ToLower().Contains(s)) ||
+					(u.Email != null && u.Email.ToLower().Contains(s)) ||
+					(u.PhoneNumber != null && u.PhoneNumber.ToLower().Contains(s))
+				);
+			}
+
+			if (!string.IsNullOrWhiteSpace(roleName))
+			{
+				query = query.Where(u => u.Role != null && u.Role.RoleName == roleName);
+			}
+
+			if (!string.IsNullOrWhiteSpace(status))
+			{
+				if (status == "active")
+					query = query.Where(u => u.IsActive == true);
+				else if (status == "inactive")
+					query = query.Where(u => u.IsActive == false);
+			}
+
+			if (departmentId.HasValue && departmentId.Value > 0)
+			{
+				query = query.Where(u => u.DepartmentId == departmentId.Value);
+			}
+
+			// Total count after filters
+			var totalCount = await query.CountAsync();
+
+			// Paging + ordering
+			var users = await query
 				.OrderBy(u => u.FullName)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
 				.ToListAsync();
 
-			return View(users);
+			var vm = new UserListViewModel
+			{
+				Users = users,
+				Roles = roles,
+				Departments = departments,
+				Page = page,
+				PageSize = pageSize,
+				TotalCount = totalCount,
+				Search = search,
+				RoleName = roleName,
+				Status = status,
+				DepartmentId = departmentId
+			};
+
+			return View(vm);
 		}
+
+
 
 		[HttpPost]
 		public async Task<IActionResult> ToggleUserStatus([FromBody] ToggleUserRequest request)
@@ -1942,16 +2013,17 @@ namespace AIHUBOS.Controllers
 		[HttpGet]
 		public async System.Threading.Tasks.Task<IActionResult> GetTaskDetail(int userTaskId)
 		{
-			if (!IsAdmin())
-				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
-
 			var userId = HttpContext.Session.GetInt32("UserId");
+			if (!userId.HasValue)
+				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
 
 			try
 			{
 				var userTask = await _context.UserTasks
 					.Include(ut => ut.Task)
-					.FirstOrDefaultAsync(ut => ut.UserTaskId == userTaskId && ut.UserId == userId);
+					.Include(ut => ut.User)
+						.ThenInclude(u => u.Department)
+					.FirstOrDefaultAsync(ut => ut.UserTaskId == userTaskId && ut.UserId == userId.Value);
 
 				if (userTask == null)
 				{
@@ -1967,7 +2039,6 @@ namespace AIHUBOS.Controllers
 
 				var task = userTask.Task;
 
-				// ✅ XÁC ĐỊNH TRẠNG THÁI HIỂN THỊ
 				string statusText = userTask.Status switch
 				{
 					"TODO" => "Chưa bắt đầu",
@@ -1998,7 +2069,6 @@ namespace AIHUBOS.Controllers
 					_ => "inbox"
 				};
 
-				// ✅ KIỂM TRA QUÁ HẠN
 				bool isOverdue = false;
 				bool isCompletedLate = false;
 
@@ -2006,7 +2076,6 @@ namespace AIHUBOS.Controllers
 				{
 					if (userTask.Status == "Done")
 					{
-						// Hoàn thành muộn?
 						if (userTask.UpdatedAt.HasValue && userTask.UpdatedAt.Value > task.Deadline.Value)
 						{
 							isCompletedLate = true;
@@ -2016,7 +2085,6 @@ namespace AIHUBOS.Controllers
 					}
 					else
 					{
-						// Đang quá hạn?
 						if (DateTime.Now > task.Deadline.Value)
 						{
 							isOverdue = true;

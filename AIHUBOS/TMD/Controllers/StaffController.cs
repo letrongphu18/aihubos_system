@@ -66,9 +66,68 @@ namespace AIHUBOS.Controllers
 		private bool IsStaffOrAdmin()
 		{
 			var roleName = HttpContext.Session.GetString("RoleName");
-			return roleName == "Staff" || roleName == "Admin";
-		}
 
+			// Chỉ chặn nếu role NULL hoặc rỗng (chưa đăng nhập đúng cách)
+			if (string.IsNullOrEmpty(roleName))
+				return false;
+
+			// ✅ Chấp nhận MỌI role hợp lệ: Admin, Staff, Manager, Guest, Tester, v.v.
+			return true;
+		}
+		// ✅ THÊM METHOD NÀY VÀO StaffController.cs
+		[HttpGet]
+		public async Task<IActionResult> GetUserPermissions()
+		{
+			if (!IsAuthenticated())
+				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
+
+			var userId = HttpContext.Session.GetInt32("UserId").Value;
+
+			try
+			{
+				var user = await _context.Users
+					.Include(u => u.Role)
+					.Include(u => u.Department)
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+					return Json(new { success = false, message = "Không tìm thấy người dùng" });
+
+				var roleName = user.Role?.RoleName ?? "";
+				var deptName = user.Department?.DepartmentName ?? "";
+
+				// ✅ KIỂM TRA XEM CÓ PHẢI DEV KHÔNG
+				bool isDevRole = roleName.Contains("Dev", StringComparison.OrdinalIgnoreCase)
+							  || roleName.Equals("Developer", StringComparison.OrdinalIgnoreCase);
+
+				bool isDevDepartment = deptName.Contains("Dev Backend", StringComparison.OrdinalIgnoreCase)
+									|| deptName.Contains("Dev Frontend", StringComparison.OrdinalIgnoreCase)
+									|| deptName.Contains("Backend", StringComparison.OrdinalIgnoreCase)
+									|| deptName.Contains("Frontend", StringComparison.OrdinalIgnoreCase);
+
+				bool canSendToTesting = isDevRole || isDevDepartment;
+
+				return Json(new
+				{
+					success = true,
+					permissions = new
+					{
+						canSendToTesting = canSendToTesting,
+						roleName = roleName,
+						departmentName = deptName,
+						fullName = user.FullName,
+						// ✅ QUYỀN CỤ THỂ CHO TỪNG LOẠI USER
+						allowedStatuses = canSendToTesting
+							? new[] { "TODO", "InProgress", "Testing" }  // Dev có thể gửi test
+							: new[] { "TODO", "InProgress", "Done" }      // Non-dev chỉ Done
+					}
+				});
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = ex.Message });
+			}
+		}
 		// ============================================
 		// REVERSE GEOCODING - LẤY ĐỊA CHỈ TỪ TỌA ĐỘ (IMPROVED WITH RETRY)
 		// ============================================
@@ -552,172 +611,62 @@ namespace AIHUBOS.Controllers
 		// ============================================
 
 		[HttpGet]
-		public async System.Threading.Tasks.Task<IActionResult> MyTasks()
+		public async Task<IActionResult> MyTasks()
 		{
 			if (!IsAuthenticated())
 				return RedirectToAction("Login", "Account");
 
-			var userId = HttpContext.Session.GetInt32("UserId");
+			// ✅ ĐÚNG - Lấy int
+			var userIdNullable = HttpContext.Session.GetInt32("UserId");
+			if (!userIdNullable.HasValue)
+				return RedirectToAction("Login", "Account");
 
+			var userId = userIdNullable.Value;
+
+			// ✅ So sánh int == int (EF sinh SQL đúng)
 			var myTasks = await _context.UserTasks
-				.Include(ut => ut.Task)
+				.Include(ut => ut.Task)  // ✅ CHỈ cần Task
 				.Where(ut => ut.UserId == userId)
-				.OrderBy(ut => ut.Task.TaskName)
+				.OrderBy(ut => ut.Status == "TODO" ? 1 : ut.Status == "InProgress" ? 2 : 3)
+				.ThenByDescending(ut => ut.Task.Priority == "High" ? 1 : ut.Task.Priority == "Medium" ? 2 : 3)
 				.ToListAsync();
 
 			return View(myTasks);
 		}
-		[HttpPost]
-		public async Task<IActionResult> UpdateTaskProgress([FromBody] UpdateTaskProgressRequest request)
+
+
+
+		[HttpGet]
+		public async Task<IActionResult> GetTesters()
 		{
 			if (!IsAuthenticated())
 				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
 
-			var userId = HttpContext.Session.GetInt32("UserId");
-
-			var userTask = await _context.UserTasks
-				.Include(ut => ut.Task)
-				.Include(ut => ut.User)
-				.FirstOrDefaultAsync(ut => ut.UserTaskId == request.UserTaskId && ut.UserId == userId);
-
-			if (userTask == null)
-				return Json(new { success = false, message = "Không tìm thấy công việc" });
-
-			// ✅ VALIDATE STATUS
-			var validStatuses = new[] { "TODO", "InProgress", "Testing", "Done", "Reopen" };
-			if (!validStatuses.Contains(request.Status))
-				return Json(new { success = false, message = "Trạng thái không hợp lệ" });
-
-			var currentStatus = userTask.Status ?? "TODO";
-			var newStatus = request.Status;
-
-			// ✅ VALIDATE TRANSITION - CHỈ CHO PHÉP THEO FLOW
-			bool isValidTransition = (currentStatus, newStatus) switch
-			{
-				("TODO", "InProgress") => true,           // Bắt đầu làm
-				("TODO", "TODO") => true,                 // Stay TODO
-				("InProgress", "InProgress") => true,     // Stay InProgress
-				("InProgress", "Testing") => true,        // Gửi test
-				("Reopen", "InProgress") => true,         // Sửa lại sau khi reopen
-				("Testing", _) => false,                  // KHÔNG CHO DEV THAY ĐỔI (chỉ Tester)
-				("Done", _) => false,                     // KHÔNG CHO THAY ĐỔI
-				_ => false
-			};
-
-			if (!isValidTransition)
-			{
-				var errorMessage = currentStatus switch
-				{
-					"Testing" => "Task đang chờ Tester kiểm tra. Bạn không thể thay đổi trạng thái.",
-					"Done" => "Task đã hoàn thành. Không thể thay đổi trạng thái.",
-					_ => $"Không thể chuyển từ '{currentStatus}' sang '{newStatus}'"
-				};
-
-				return Json(new { success = false, message = errorMessage });
-			}
-
-			// ✅ VALIDATE URL FORMAT (CHỈ KHI CÓ NHẬP)
-			//if (!string.IsNullOrWhiteSpace(request.ReportLink))
-			//{
-			//	var reportLink = request.ReportLink.Trim();
-			//	if (!Uri.TryCreate(reportLink, UriKind.Absolute, out var uriResult)
-			//		|| (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
-			//	{
-			//		return Json(new
-			//		{
-			//			success = false,
-			//			message = "⚠️ Link báo cáo không hợp lệ.\n\nVui lòng nhập URL đầy đủ (bắt đầu bằng http:// hoặc https://)"
-			//		});
-			//	}
-			//}
-
 			try
 			{
-				var oldData = new { userTask.Status, userTask.ReportLink };
-
-				userTask.Status = request.Status;
-				//userTask.ReportLink = string.IsNullOrWhiteSpace(request.ReportLink) ? null : request.ReportLink.Trim();
-				userTask.UpdatedAt = DateTime.Now;
-
-				await _context.SaveChangesAsync();
-
-				var newData = new { userTask.Status, userTask.ReportLink };
-
-				await _auditHelper.LogDetailedAsync(
-					userId,
-					"UPDATE",
-					"UserTask",
-					userTask.UserTaskId,
-					oldData,
-					newData,
-					$"Cập nhật trạng thái: {userTask.Task.TaskName}",
-					new Dictionary<string, object>
+				var testers = await _context.Users
+					.Include(u => u.Role)
+					.Include(u => u.Department)
+					.Where(u => u.IsActive == true && (u.Role.RoleName == "Tester" || u.IsTester))
+					.OrderBy(u => u.Department.DepartmentName)
+					.ThenBy(u => u.FullName)
+					.Select(u => new
 					{
-				{ "TaskName", userTask.Task.TaskName },
-				{ "OldStatus", oldData.Status ?? "NULL" },
-				{ "NewStatus", newData.Status },
-				{ "ReportLink", newData.ReportLink ?? "NULL" }
-					}
-				);
+						userId = u.UserId,
+						fullName = u.FullName,
+						email = u.Email,
+						departmentName = u.Department != null ? u.Department.DepartmentName : "N/A",
+						roleName = u.Role.RoleName
+					})
+					.ToListAsync();
 
-				// ✅ GỬI THÔNG BÁO KHI CHUYỂN SANG TESTING
-				if (request.Status == "Testing")
-				{
-					var reportInfo = !string.IsNullOrEmpty(userTask.ReportLink)
-						? $"\n\n📎 Report: {userTask.ReportLink}"
-						: "";
-
-					// Gửi cho Admin
-					await _notificationService.SendToAdminsAsync(
-						"Task chờ test",
-						$"{userTask.User.FullName} đã hoàn thành task: {userTask.Task.TaskName}. Cần Tester kiểm tra.{reportInfo}",
-						"info",
-						"/Admin/TaskList"
-					);
-
-					// Gửi cho Tester (role = "Tester" HOẶC IsTester = true)
-					var testers = await _context.Users
-						.Include(u => u.Role)
-						.Where(u => (u.Role.RoleName == "Tester" || u.IsTester) && u.IsActive == true)
-						.ToListAsync();
-
-					foreach (var tester in testers)
-					{
-						await _notificationService.SendToUserAsync(
-							tester.UserId,
-							"Task mới cần test",
-							$"Task '{userTask.Task.TaskName}' từ {userTask.User.FullName} cần được test.{reportInfo}",
-							"info",
-							"/Tester/Dashboard"
-						);
-					}
-				}
-
-				var successMessage = newStatus switch
-				{
-					"InProgress" => "✅ Đã chuyển sang trạng thái 'Đang làm'",
-					"Testing" => "✅ Đã gửi task cho Tester kiểm tra\n\nTester sẽ nhận được thông báo ngay!",
-					_ => "✅ Cập nhật trạng thái thành công!"
-				};
-
-				return Json(new { success = true, message = successMessage });
+				return Json(new { success = true, testers });
 			}
 			catch (Exception ex)
 			{
-				await _auditHelper.LogFailedAttemptAsync(
-					userId,
-					"UPDATE",
-					"UserTask",
-					$"Exception: {ex.Message}",
-					new { UserTaskId = request.UserTaskId, Error = ex.ToString() }
-				);
-
-				return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+				return Json(new { success = false, message = ex.Message });
 			}
 		}
-
-
-
 		// ============================================
 		// CHECK-IN / CHECK-OUT với UPLOAD ẢNH
 		// ============================================
@@ -994,22 +943,19 @@ namespace AIHUBOS.Controllers
 		// TASKS SUMMARY FOR DASHBOARD
 		// ============================================
 		[HttpGet]
-		public async System.Threading.Tasks.Task<IActionResult> GetMyTasksSummary()
+		public async Task<IActionResult> GetMyTasksSummary()
 		{
 			if (!IsAuthenticated())
 				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
 
-			var userId = HttpContext.Session.GetInt32("UserId");
+			var userIdNullable = HttpContext.Session.GetInt32("UserId");
+			if (!userIdNullable.HasValue)
+				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
+
+			var userId = userIdNullable.Value;
 
 			try
 			{
-				await _auditHelper.LogViewAsync(
-					userId.Value,
-					"UserTask",
-					userId.Value,
-					"Xem tóm tắt công việc trên Dashboard"
-				);
-
 				var myTasks = await _context.UserTasks
 					.Include(ut => ut.Task)
 					.Where(ut => ut.UserId == userId && ut.Task.IsActive == true)
@@ -1021,19 +967,16 @@ namespace AIHUBOS.Controllers
 					.Select(ut =>
 					{
 						var task = ut.Task;
-
-						// ✅ XÁC ĐỊNH TRẠNG THÁI - KHÔNG CÒN SỬ DỤNG CompletedThisWeek/TargetPerWeek
 						string status = ut.Status ?? "TODO";
 
 						// ✅ LOGIC KIỂM TRA QUÁ HẠN
-						var isOverdue = false;
-						var isCompletedLate = false;
+						bool isOverdue = false;
+						bool isCompletedLate = false;
 
 						if (task.Deadline.HasValue)
 						{
-							if (status == "Done" || status == "Completed")
+							if (status == "Done")
 							{
-								// Đã hoàn thành - kiểm tra hoàn thành trước hay sau deadline
 								if (ut.UpdatedAt.HasValue && ut.UpdatedAt.Value > task.Deadline.Value)
 								{
 									isCompletedLate = true;
@@ -1042,7 +985,6 @@ namespace AIHUBOS.Controllers
 							}
 							else
 							{
-								// Chưa hoàn thành và đã quá deadline
 								if (DateTime.Now > task.Deadline.Value)
 								{
 									isOverdue = true;
@@ -1072,7 +1014,7 @@ namespace AIHUBOS.Controllers
 					success = true,
 					tasks = tasksSummary,
 					totalTasks = tasksSummary.Count,
-					completedTasks = tasksSummary.Count(t => t.status == "Completed" || t.status == "Done"),
+					completedTasks = tasksSummary.Count(t => t.status == "Done"),
 					inProgressTasks = tasksSummary.Count(t => t.status == "InProgress"),
 					overdueTasks = tasksSummary.Count(t => t.isOverdue)
 				});
@@ -2099,7 +2041,210 @@ namespace AIHUBOS.Controllers
 			}
 		}
 
+		[HttpPost]
+		public async Task<IActionResult> UpdateTaskProgress([FromBody] UpdateTaskProgressRequest request)
+		{
+			if (!IsAuthenticated())
+				return Json(new { success = false, message = "Phiên đăng nhập hết hạn" });
 
+			var userId = HttpContext.Session.GetInt32("UserId").Value;
+
+			try
+			{
+				var userTask = await _context.UserTasks
+					.Include(ut => ut.Task)
+					.Include(ut => ut.User)
+						.ThenInclude(u => u.Department)
+					.FirstOrDefaultAsync(ut => ut.UserTaskId == request.UserTaskId && ut.UserId == userId);
+
+				if (userTask == null)
+					return Json(new { success = false, message = "Không tìm thấy công việc" });
+
+				var oldStatus = userTask.Status ?? "TODO";
+
+				// ✅ 1. VALIDATE: Không cho phép cập nhật task đã hoàn thành
+				if (oldStatus == "Done")
+					return Json(new { success = false, message = "⚠️ Công việc đã hoàn thành, không thể cập nhật" });
+
+				// ✅ 2. KIỂM TRA XEM USER CÓ THUỘC DEV KHÔNG
+				var userDepartmentName = userTask.User.Department?.DepartmentName ?? "";
+				bool isDevDepartment = userDepartmentName.Contains("Dev Backend", StringComparison.OrdinalIgnoreCase)
+									|| userDepartmentName.Contains("Dev Frontend", StringComparison.OrdinalIgnoreCase)
+									|| userDepartmentName.Contains("Backend", StringComparison.OrdinalIgnoreCase)
+									|| userDepartmentName.Contains("Frontend", StringComparison.OrdinalIgnoreCase);
+
+				// ✅ 3. VALIDATE: Status Transition Flow - DỰA VÀO QUYỀN
+				Dictionary<string, List<string>> validTransitions;
+
+				if (isDevDepartment)
+				{
+					// ✅ DEV: TODO -> InProgress -> Testing (KHÔNG có Done)
+					validTransitions = new Dictionary<string, List<string>>
+			{
+				{ "TODO", new List<string> { "InProgress" } },
+				{ "InProgress", new List<string> { "Testing", "TODO" } }, // Dev gửi test, không có Done
+                { "Reopen", new List<string> { "InProgress" } },
+				{ "Testing", new List<string> { } }, // Chỉ Tester chuyển
+                { "Done", new List<string> { } }
+			};
+				}
+				else
+				{
+					// ✅ NON-DEV (Content, Marketing, ...): TODO -> InProgress -> Done
+					validTransitions = new Dictionary<string, List<string>>
+			{
+				{ "TODO", new List<string> { "InProgress" } },
+				{ "InProgress", new List<string> { "Done", "TODO" } }, // Non-Dev hoàn thành trực tiếp
+                { "Reopen", new List<string> { "InProgress" } },
+				{ "Testing", new List<string> { } },
+				{ "Done", new List<string> { } }
+			};
+				}
+
+				if (!validTransitions.ContainsKey(oldStatus) || !validTransitions[oldStatus].Contains(request.Status))
+				{
+					var allowedStatuses = validTransitions.ContainsKey(oldStatus) && validTransitions[oldStatus].Count > 0
+						? string.Join(", ", validTransitions[oldStatus])
+						: "không có trạng thái nào";
+
+					return Json(new
+					{
+						success = false,
+						message = $"⚠️ Không thể chuyển từ '{GetStatusText(oldStatus)}' sang '{GetStatusText(request.Status)}'\n\n" +
+								 $"Các trạng thái hợp lệ: {allowedStatuses}"
+					});
+				}
+
+				// ✅ 4. VALIDATE: Chỉ Dev mới được gửi test
+				if (request.Status == "Testing")
+				{
+					if (!isDevDepartment)
+					{
+						return Json(new
+						{
+							success = false,
+							message = "⚠️ Chỉ nhân viên thuộc phòng ban Dev Backend hoặc Dev Frontend mới được gửi test"
+						});
+					}
+
+					// ✅ BẮT BUỘC CHỌN TESTER
+					if (!request.TesterId.HasValue || request.TesterId.Value <= 0)
+					{
+						return Json(new
+						{
+							success = false,
+							message = "⚠️ Vui lòng chọn Tester trước khi gửi test",
+							needTester = true
+						});
+					}
+
+					// ✅ KIỂM TRA TESTER CÓ TỒN TẠI
+					var testerExists = await _context.Users
+						.AnyAsync(u => u.UserId == request.TesterId.Value
+							&& u.IsActive == true
+							&& (u.IsTester || u.Role.RoleName == "Tester"));
+
+					if (!testerExists)
+					{
+						return Json(new
+						{
+							success = false,
+							message = "⚠️ Tester được chọn không tồn tại hoặc không còn hoạt động"
+						});
+					}
+				}
+
+				// ✅ 5. CẬP NHẬT TRẠNG THÁI
+				userTask.Status = request.Status;
+				userTask.ReportLink = request.ReportLink ?? userTask.ReportLink;
+				userTask.UpdatedAt = DateTime.Now;
+
+				await _context.SaveChangesAsync();
+
+				// ✅ 6. LOG AUDIT
+				await _auditHelper.LogDetailedAsync(
+					userId,
+					"UPDATE",
+					"UserTask",
+					userTask.UserTaskId,
+					new { Status = oldStatus, ReportLink = userTask.ReportLink },
+					new { Status = request.Status, ReportLink = request.ReportLink },
+					$"Cập nhật tiến độ task: {userTask.Task.TaskName}",
+					new Dictionary<string, object>
+					{
+				{ "OldStatus", oldStatus },
+				{ "NewStatus", request.Status },
+				{ "TesterId", request.TesterId ?? 0 },
+				{ "IsDev", isDevDepartment }
+					}
+				);
+
+				// ✅ 7. GỬI THÔNG BÁO
+				if (request.Status == "Testing" && request.TesterId.HasValue)
+				{
+					var tester = await _context.Users.FindAsync(request.TesterId.Value);
+
+					// Gửi cho Tester
+					await _notificationService.SendToUserAsync(
+						request.TesterId.Value,
+						"Task mới cần test",
+						$"Task '{userTask.Task.TaskName}' từ {userTask.User.FullName} cần bạn test",
+						"info",
+						"/Tester/Dashboard"
+					);
+
+					// Gửi cho Admin
+					await _notificationService.SendToAdminsAsync(
+						"Task gửi test",
+						$"{userTask.User.FullName} vừa gửi task '{userTask.Task.TaskName}' cho {tester?.FullName ?? "Tester"}",
+						"info",
+						"/Admin/TaskList"
+					);
+				}
+				else if (request.Status == "Done")
+				{
+					// ✅ GỬI THÔNG BÁO KHI HOÀN THÀNH (CHO NON-DEV)
+					await _notificationService.SendToAdminsAsync(
+						"Task hoàn thành",
+						$"{userTask.User.FullName} vừa hoàn thành task '{userTask.Task.TaskName}'",
+						"success",
+						"/Admin/TaskList"
+					);
+				}
+
+				return Json(new
+				{
+					success = true,
+					message = $"✅ Cập nhật thành công!\nTrạng thái: {GetStatusText(request.Status)}"
+				});
+			}
+			catch (Exception ex)
+			{
+				await _auditHelper.LogFailedAttemptAsync(
+					userId,
+					"UPDATE",
+					"UserTask",
+					$"Exception: {ex.Message}",
+					new { UserTaskId = request.UserTaskId, Error = ex.ToString() }
+				);
+
+				return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+			}
+		}
+
+		private string GetStatusText(string status)
+		{
+			return status switch
+			{
+				"TODO" => "Chưa bắt đầu",
+				"InProgress" => "Đang làm",
+				"Testing" => "Chờ test",
+				"Done" => "Hoàn thành",
+				"Reopen" => "Cần sửa lại",
+				_ => status
+			};
+		}
+		
 		[HttpPost]
 		public async Task<IActionResult> MarkNotificationAsRead([FromBody] int userNotificationId)
 		{
@@ -2171,6 +2316,8 @@ namespace AIHUBOS.Controllers
 		{
 			public int UserTaskId { get; set; }
 			public string Status { get; set; } = "TODO";
+			public string? ReportLink { get; set; }
+			public int? TesterId { get; set; }
 		}
 		public class CheckOutRequest
 		{

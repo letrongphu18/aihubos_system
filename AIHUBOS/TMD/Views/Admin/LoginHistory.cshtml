@@ -73,48 +73,41 @@
     <!-- FILTERS -->
     <div class="lh-card mb-4">
         <div class="lh-card-header">
-            <h6>
-                <i class="fas fa-filter"></i>
-                Bộ lọc
-            </h6>
-        </div>
-        <div class="lh-card-body">
-            <form method="get" action="/Admin/LoginHistory">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="lh-form-label">
-                            <i class="far fa-calendar-alt"></i>
-                            Từ ngày
-                        </label>
-                        <input type="date" name="fromDate" class="lh-form-control" value="@ViewBag.FromDate?.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="lh-form-label">
-                            <i class="far fa-calendar-alt"></i>
-                            Đến ngày
-                        </label>
-                        <input type="date" name="toDate" class="lh-form-control" value="@ViewBag.ToDate?.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="lh-form-label">
-                            <i class="fas fa-toggle-on"></i>
-                            Trạng thái
-                        </label>
-                        <select name="isSuccess" class="lh-form-control">
-                            <option value="">Tất cả</option>
-                            <option value="true" selected="@(ViewBag.IsSuccess == true)">Thành công</option>
-                            <option value="false" selected="@(ViewBag.IsSuccess == false)">Thất bại</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end gap-2">
-                        <button type="submit" class="lh-btn-filter flex-fill">
-                            <i class="fas fa-search"></i>
-                            Lọc
-                        </button>
-                        <a href="/Admin/LoginHistory" class="lh-btn-reset" title="Reset bộ lọc">
-                            <i class="fas fa-redo"></i>
-                        </a>
-                    </div>
+            <h5 class="mb-3"><i class="fas fa-filter"></i> Bộ lọc tìm kiếm</h5>
+
+            <form method="get" class="lh-filter-form">
+                <div class="lh-filter-group">
+                    <label class="lh-form-label">Từ ngày</label>
+                    <input type="datetime-local" name="startDate" class="lh-form-control"
+                           value="@Context.Request.Query["startDate"]">
+                </div>
+
+                <div class="lh-filter-group">
+                    <label class="lh-form-label">Đến ngày</label>
+                    <input type="datetime-local" name="endDate" class="lh-form-control"
+                           value="@Context.Request.Query["endDate"]">
+                </div>
+
+                <div class="lh-filter-group">
+                    <label class="lh-form-label">Trạng thái</label>
+                    <select name="status" class="lh-form-control">
+                        <option value="">-- Tất cả --</option>
+                        <option value="success" selected="@(Context.Request.Query["status"] == "success")">Thành công</option>
+                        <option value="failed" selected="@(Context.Request.Query["status"] == "failed")">Thất bại</option>
+                    </select>
+                </div>
+
+                <div class="lh-filter-group" style="flex: 2;">
+                    <label class="lh-form-label">Tìm kiếm</label>
+                    <input type="text" name="searchTerm" class="lh-form-control"
+                           placeholder="Nhập username hoặc IP..."
+                           value="@Context.Request.Query["searchTerm"]">
+                </div>
+
+                <div class="lh-filter-action">
+                    <button type="submit" class="lh-btn-filter">
+                        <i class="fas fa-search"></i> Lọc dữ liệu
+                    </button>
                 </div>
             </form>
         </div>

@@ -17,6 +17,12 @@ public partial class Department
 
     public DateTime? UpdatedAt { get; set; }
 
+    public int? LeaderId { get; set; }
+
+    public virtual User? Leader { get; set; }
+
+    public virtual ICollection<Team> Teams { get; set; } = new List<Team>();
+
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 
     public virtual ICollection<WorkScheduleException> WorkScheduleExceptions { get; set; } = new List<WorkScheduleException>();

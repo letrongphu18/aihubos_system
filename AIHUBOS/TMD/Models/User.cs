@@ -41,6 +41,8 @@ public partial class User
 
     public virtual Department? Department { get; set; }
 
+    public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
+
     public virtual ICollection<Kpihistory> Kpihistories { get; set; } = new List<Kpihistory>();
 
     public virtual ICollection<LateRequest> LateRequestReviewedByNavigations { get; set; } = new List<LateRequest>();
@@ -83,13 +85,21 @@ public partial class User
 
     public virtual ICollection<SystemSetting> SystemSettings { get; set; } = new List<SystemSetting>();
 
+    public virtual ICollection<TeamMember> TeamMembers { get; set; } = new List<TeamMember>();
+
+    public virtual ICollection<Team> Teams { get; set; } = new List<Team>();
+
     public virtual ICollection<UserSalarySetting> UserSalarySettingCreatedByNavigations { get; set; } = new List<UserSalarySetting>();
 
     public virtual ICollection<UserSalarySetting> UserSalarySettingUpdatedByNavigations { get; set; } = new List<UserSalarySetting>();
 
     public virtual UserSalarySetting? UserSalarySettingUser { get; set; }
+	public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>(); // ⭐ QUAN TRỌNG NHẤT
 
-    public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
+
+	public virtual ICollection<UserTask> UserTaskTesters { get; set; } = new List<UserTask>();
+
+    //public virtual ICollection<UserTask> UserTaskUsers { get; set; } = new List<UserTask>();
 
     public virtual ICollection<WorkScheduleException> WorkScheduleExceptionCreatedByNavigations { get; set; } = new List<WorkScheduleException>();
 

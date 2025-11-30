@@ -57,6 +57,10 @@ public partial class AihubSystemContext : DbContext
 
     public virtual DbSet<Task> Tasks { get; set; }
 
+    public virtual DbSet<Team> Teams { get; set; }
+
+    public virtual DbSet<TeamMember> TeamMembers { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
@@ -169,10 +173,16 @@ public partial class AihubSystemContext : DbContext
         {
             entity.HasKey(e => e.DepartmentId).HasName("PK__Departme__B2079BED5523DA78");
 
+            entity.HasIndex(e => e.LeaderId, "IX_Department_LeaderId").HasFilter("([LeaderId] IS NOT NULL)");
+
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.DepartmentName).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+            entity.HasOne(d => d.Leader).WithMany(p => p.Departments)
+                .HasForeignKey(d => d.LeaderId)
+                .HasConstraintName("FK_Department_Leader");
         });
 
         modelBuilder.Entity<Kpihistory>(entity =>
@@ -610,6 +620,46 @@ public partial class AihubSystemContext : DbContext
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
         });
 
+        modelBuilder.Entity<Team>(entity =>
+        {
+            entity.HasKey(e => e.TeamId).HasName("PK__Teams__123AE7996987189A");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.TeamName).HasMaxLength(100);
+
+            entity.HasOne(d => d.Department).WithMany(p => p.Teams)
+                .HasForeignKey(d => d.DepartmentId)
+                .HasConstraintName("FK__Teams__Departmen__7C1A6C5A");
+
+            entity.HasOne(d => d.TeamLeadUser).WithMany(p => p.Teams)
+                .HasForeignKey(d => d.TeamLeadUserId)
+                .HasConstraintName("FK__Teams__TeamLeadU__7D0E9093");
+        });
+
+        modelBuilder.Entity<TeamMember>(entity =>
+        {
+            entity.HasKey(e => e.TeamMemberId).HasName("PK__TeamMemb__C7C092E5827837B1");
+
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.JoinedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Team).WithMany(p => p.TeamMembers)
+                .HasForeignKey(d => d.TeamId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__TeamMembe__TeamI__01D345B0");
+
+            entity.HasOne(d => d.User).WithMany(p => p.TeamMembers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__TeamMembe__UserI__02C769E9");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C56E8178B");
@@ -698,6 +748,10 @@ public partial class AihubSystemContext : DbContext
 
             entity.HasIndex(e => e.Status, "IX_UserTasks_Status");
 
+            entity.HasIndex(e => new { e.Status, e.TesterId }, "IX_UserTasks_Status_TesterId");
+
+            entity.HasIndex(e => e.TesterId, "IX_UserTasks_TesterId");
+
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.ReportLink).HasMaxLength(500);
             entity.Property(e => e.Status)
@@ -708,10 +762,17 @@ public partial class AihubSystemContext : DbContext
                 .HasForeignKey(d => d.TaskId)
                 .HasConstraintName("FK__UserTasks__TaskI__4D5F7D71");
 
-            entity.HasOne(d => d.User).WithMany(p => p.UserTasks)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserTasks__UserI__4E53A1AA");
-        });
+            entity.HasOne(d => d.Tester).WithMany(p => p.UserTaskTesters)
+                .HasForeignKey(d => d.TesterId)
+                .HasConstraintName("FK_UserTasks_Tester");
+
+			// ✅ SAU (ĐÚNG)
+			entity.HasOne(d => d.User)
+				.WithMany(p => p.UserTasks)  // ✅ ĐỔI THÀNH UserTasks
+				.HasForeignKey(d => d.UserId)
+				.OnDelete(DeleteBehavior.Cascade)
+				.HasConstraintName("FK__UserTasks__UserId__...");
+		});
 
         modelBuilder.Entity<VwActiveSalarySetting>(entity =>
         {

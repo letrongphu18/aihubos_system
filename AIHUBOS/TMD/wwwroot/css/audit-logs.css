@@ -1,561 +1,499 @@
-﻿/* ===== AUDIT LOGS - DEDICATED STYLES ===== */
-/* Prefix: aihub-audit- */
+﻿/* =====================================================
+   AUDIT LOGS STYLES
+   Prefix: aihub-audit-
+   Based on User Management Design System
+   ===================================================== */
 
-/* Variables are inherited from admin-layout.css */
+:root {
+    /* Color Palette - Đồng bộ với hệ thống */
+    --audit-primary: #1a1f4a;
+    --audit-secondary: #6366f1;
+    --audit-success: #10b981;
+    --audit-warning: #f59e0b;
+    --audit-danger: #ef4444;
+    --audit-info: #3b82f6;
+    --audit-light: #f8fafc;
+    --audit-dark: #0f172a;
+    --audit-border: #e2e8f0;
+    --audit-shadow: rgba(15, 23, 42, 0.08);
+    --audit-text: #334155;
+    --audit-text-muted: #64748b;
+}
 
-/* ===== CONTAINER ===== */
+/* Dark Mode Variables */
+body.staff-dark-mode {
+    --audit-light: #1e293b;
+    --audit-dark: #0f172a;
+    --audit-border: #334155;
+    --audit-shadow: rgba(0, 0, 0, 0.3);
+    --audit-text: #e2e8f0;
+    --audit-text-muted: #94a3b8;
+}
+
+/* ========== LAYOUT ========== */
 .aihub-audit-container {
-    padding: 30px;
+    padding: 2rem;
+    background: var(--audit-light);
+    min-height: calc(100vh - 70px);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--audit-text);
 }
 
-/* ===== HEADER ===== */
+/* ========== HEADER ========== */
 .aihub-audit-header {
-    background: var(--aihub-bg-primary);
-    padding: 28px 32px;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px var(--aihub-shadow);
-    margin-bottom: 24px;
-    border: 1px solid var(--aihub-border-color);
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--audit-primary) 0%, var(--audit-secondary) 100%);
+    border-radius: 1.5rem;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px var(--audit-shadow);
+    color: white;
+    position: relative;
+    overflow: hidden;
 }
+
+    /* Hiệu ứng nền */
+    .aihub-audit-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
 
 .aihub-audit-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--aihub-text-primary);
-    margin-bottom: 8px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
 }
-
-    .aihub-audit-title i {
-        color: var(--aihub-terracotta);
-        font-size: 26px;
-    }
 
 .aihub-audit-header p {
-    color: var(--aihub-text-secondary);
-    margin-bottom: 0;
-    font-size: 14px;
+    opacity: 0.9;
+    margin: 0;
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 1;
 }
 
-.aihub-audit-header strong {
-    color: var(--aihub-golden);
-    font-weight: 700;
-}
-
-/* ===== FILTERS ===== */
+/* ========== FILTERS SECTION ========== */
 .aihub-audit-filters {
-    background: var(--aihub-bg-primary);
-    padding: 24px;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px var(--aihub-shadow);
-    margin-bottom: 24px;
-    border: 1px solid var(--aihub-border-color);
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px var(--audit-shadow);
+    border: 1px solid var(--audit-border);
 }
 
-    .aihub-audit-filters .aihub-audit-form-row {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
+body.staff-dark-mode .aihub-audit-filters {
+    background: #1e293b;
+    border-color: var(--audit-border);
+}
 
-    .aihub-audit-filters .aihub-audit-form-col {
-        flex: 1;
-        min-width: 200px;
-    }
+.aihub-audit-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
 
-    .aihub-audit-filters .aihub-audit-form-col-auto {
-        display: flex;
-        align-items: flex-end;
-        gap: 12px;
-    }
+.aihub-audit-form-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.aihub-audit-form-col-auto {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 0.5rem;
+}
 
 .aihub-audit-form-label {
     display: block;
+    margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--aihub-text-primary);
-    margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 0.85rem;
+    color: var(--audit-text);
 }
 
-.aihub-audit-form-control,
-.aihub-audit-form-select {
+.aihub-audit-form-select,
+.aihub-audit-form-control {
     width: 100%;
-    border: 2px solid var(--aihub-border-color);
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: var(--aihub-text-primary);
-    background: var(--aihub-bg-secondary);
-    transition: all 0.3s ease;
-    outline: none;
+    height: 42px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    color: var(--audit-text);
+    background-color: var(--audit-light);
+    border: 1px solid var(--audit-border);
+    border-radius: 0.75rem;
+    transition: all 0.2s;
 }
 
-    .aihub-audit-form-control:focus,
-    .aihub-audit-form-select:focus {
-        border-color: var(--aihub-terracotta);
-        box-shadow: 0 0 0 3px rgba(122, 63, 48, 0.15);
-        background: var(--aihub-bg-primary);
-    }
+body.staff-dark-mode .aihub-audit-form-select,
+body.staff-dark-mode .aihub-audit-form-control {
+    background-color: var(--audit-dark);
+    color: var(--audit-text);
+    border-color: var(--audit-border);
+}
 
-.aihub-audit-form-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237A3F30' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
+.aihub-audit-form-select:focus,
+.aihub-audit-form-control:focus {
+    border-color: var(--audit-secondary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    background-color: white;
+}
+
+body.staff-dark-mode .aihub-audit-form-select:focus,
+body.staff-dark-mode .aihub-audit-form-control:focus {
+    background-color: rgba(255,255,255,0.05);
 }
 
 .aihub-audit-btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
+    height: 42px;
+    padding: 0 1.5rem;
+    border-radius: 0.75rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 0.5rem;
     text-decoration: none;
-    white-space: nowrap;
+    font-size: 0.9rem;
 }
 
 .aihub-audit-btn-primary {
-    background: linear-gradient(135deg, var(--aihub-terracotta), var(--aihub-clay));
+    background: var(--audit-secondary);
     color: white;
-    box-shadow: 0 4px 12px rgba(122, 63, 48, 0.3);
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
 }
 
     .aihub-audit-btn-primary:hover {
+        background: #4f46e5;
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(122, 63, 48, 0.4);
+        box-shadow: 0 6px 10px -1px rgba(99, 102, 241, 0.3);
+        color: white;
     }
 
 .aihub-audit-btn-outline {
     background: transparent;
-    border: 2px solid var(--aihub-border-color);
-    color: var(--aihub-text-secondary);
+    color: var(--audit-text-muted);
+    border: 1px solid var(--audit-border);
 }
 
     .aihub-audit-btn-outline:hover {
-        background: var(--aihub-hover-bg);
-        border-color: var(--aihub-terracotta);
-        color: var(--aihub-terracotta);
+        background: var(--audit-border);
+        color: var(--audit-text);
     }
 
-/* ===== TABLE ===== */
+/* ========== TABLE STYLES ========== */
 .aihub-audit-table {
-    background: var(--aihub-bg-primary);
-    border-radius: 16px;
-    box-shadow: 0 2px 16px var(--aihub-shadow);
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px var(--audit-shadow);
+    border: 1px solid var(--audit-border);
     overflow: hidden;
-    border: 1px solid var(--aihub-border-color);
+}
+
+body.staff-dark-mode .aihub-audit-table {
+    background: #1e293b;
+    border-color: var(--audit-border);
 }
 
 .aihub-audit-table-responsive {
+    width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
-
-    .aihub-audit-table-responsive::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    .aihub-audit-table-responsive::-webkit-scrollbar-track {
-        background: var(--aihub-bg-secondary);
-    }
-
-    .aihub-audit-table-responsive::-webkit-scrollbar-thumb {
-        background: var(--aihub-border-color);
-        border-radius: 4px;
-    }
-
-        .aihub-audit-table-responsive::-webkit-scrollbar-thumb:hover {
-            background: var(--aihub-text-secondary);
-        }
 
 .aihub-audit-table table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    white-space: nowrap;
 }
 
-.aihub-audit-table thead {
-    background: var(--aihub-bg-tertiary);
-    border-bottom: 2px solid var(--aihub-border-color);
+.aihub-audit-table thead th {
+    background: var(--audit-light);
+    color: var(--audit-text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--audit-border);
+    text-align: left;
 }
 
-    .aihub-audit-table thead th {
-        padding: 18px 12px;
-        text-align: left;
-        color: var(--aihub-text-primary);
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-    }
-
-.aihub-audit-table tbody tr {
-    border-bottom: 1px solid var(--aihub-border-color);
-    transition: all 0.2s ease;
+body.staff-dark-mode .aihub-audit-table thead th {
+    background: rgba(255,255,255,0.03);
+    border-bottom-color: var(--audit-border);
 }
-
-    .aihub-audit-table tbody tr:hover {
-        background: var(--aihub-bg-tertiary);
-    }
-
-    .aihub-audit-table tbody tr:last-child {
-        border-bottom: none;
-    }
 
 .aihub-audit-table tbody td {
-    padding: 16px 12px;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--audit-border);
     vertical-align: middle;
-    color: var(--aihub-text-primary);
+    font-size: 0.9rem;
+    color: var(--audit-text);
 }
 
-/* ===== TIMESTAMP ===== */
+.aihub-audit-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.aihub-audit-table tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.03);
+}
+
+body.staff-dark-mode .aihub-audit-table tbody tr:hover {
+    background-color: rgba(255,255,255,0.03);
+}
+
+/* ========== TABLE CELL CONTENTS ========== */
+
+/* Timestamp */
 .aihub-audit-timestamp {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.75rem;
 }
 
     .aihub-audit-timestamp i {
-        font-size: 18px;
-        color: var(--aihub-text-secondary);
+        font-size: 1.1rem;
+        color: var(--audit-text-muted);
+        background: var(--audit-light);
+        padding: 8px;
+        border-radius: 50%;
     }
 
+body.staff-dark-mode .aihub-audit-timestamp i {
+    background: rgba(255,255,255,0.05);
+}
+
 .aihub-audit-timestamp-date {
-    font-weight: 700;
-    color: var(--aihub-text-primary);
-    font-size: 13px;
+    font-weight: 600;
+    color: var(--audit-text);
 }
 
 .aihub-audit-timestamp-time {
-    font-size: 12px;
-    color: var(--aihub-text-secondary);
+    font-size: 0.8rem;
+    color: var(--audit-text-muted);
 }
 
-/* ===== USER INFO ===== */
+/* User Info */
 .aihub-audit-user-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
 }
 
 .aihub-audit-user-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-    border: 2px solid var(--aihub-border-color);
 }
 
     .aihub-audit-user-avatar img {
         width: 100%;
         height: 100%;
+        border-radius: 50%;
         object-fit: cover;
     }
 
 .aihub-audit-user-avatar-placeholder {
-    width: 38px;
-    height: 38px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--aihub-terracotta), var(--aihub-clay));
+    background: linear-gradient(135deg, var(--audit-secondary), #818cf8);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 15px;
-    flex-shrink: 0;
-    border: 2px solid var(--aihub-border-color);
+    font-size: 0.9rem;
 }
 
 .aihub-audit-user-name {
-    font-weight: 700;
-    color: var(--aihub-text-primary);
-    font-size: 13px;
-    margin-bottom: 2px;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .aihub-audit-user-username {
-    font-size: 12px;
-    color: var(--aihub-text-secondary);
+    font-size: 0.8rem;
+    color: var(--audit-text-muted);
 }
 
-/* ===== ACTION BADGES ===== */
+/* Action Badges */
 .aihub-audit-action-badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 11px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: white;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-    .aihub-audit-action-badge i {
-        font-size: 12px;
-    }
-
-.aihub-audit-action-badge--create {
-    background: linear-gradient(135deg, #10B981, #059669);
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.aihub-audit-action-badge--update {
-    background: linear-gradient(135deg, #F59E0B, #D97706);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-}
-
-.aihub-audit-action-badge--delete {
-    background: linear-gradient(135deg, #EF4444, #DC2626);
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-}
-
-.aihub-audit-action-badge--login {
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-}
-
-.aihub-audit-action-badge--login-failed {
-    background: linear-gradient(135deg, #DC2626, #991B1B);
-    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-}
-
-.aihub-audit-action-badge--logout {
-    background: linear-gradient(135deg, #6B7280, #4B5563);
-    box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
-}
-
-.aihub-audit-action-badge--password-reset,
-.aihub-audit-action-badge--password-change {
-    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-}
-
-.aihub-audit-action-badge--check-in {
-    background: linear-gradient(135deg, #14B8A6, #0D9488);
-    box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
-}
-
-.aihub-audit-action-badge--check-out {
-    background: linear-gradient(135deg, #EC4899, #DB2777);
-    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
-}
-
-.aihub-audit-action-badge--task-report {
-    background: linear-gradient(135deg, var(--aihub-golden), #B8860B);
-    box-shadow: 0 2px 8px rgba(212, 164, 89, 0.3);
-}
-
-.aihub-audit-action-badge--unknown {
-    background: linear-gradient(135deg, #9CA3AF, #6B7280);
-    box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3);
-}
-
-/* ===== ENTITY INFO ===== */
-.aihub-audit-entity-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.aihub-audit-entity-name {
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: var(--aihub-text-primary);
-    font-size: 13px;
+    text-transform: uppercase;
+}
+
+/* Color mappings for specific actions */
+.aihub-audit-action-badge--create,
+.aihub-audit-action-badge--task-report {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--audit-success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.aihub-audit-action-badge--update,
+.aihub-audit-action-badge--password-change,
+.aihub-audit-action-badge--password-reset {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--audit-info);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.aihub-audit-action-badge--delete,
+.aihub-audit-action-badge--login-failed {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--audit-danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.aihub-audit-action-badge--login,
+.aihub-audit-action-badge--logout,
+.aihub-audit-action-badge--check-in,
+.aihub-audit-action-badge--check-out,
+.aihub-audit-action-badge--unknown {
+    background: var(--audit-light);
+    color: var(--audit-text-muted);
+    border: 1px solid var(--audit-border);
+}
+
+/* Entity & Description */
+.aihub-audit-entity-name {
+    font-weight: 600;
+    color: var(--audit-primary);
+}
+
+body.staff-dark-mode .aihub-audit-entity-name {
+    color: var(--audit-text);
 }
 
 .aihub-audit-entity-id {
-    font-size: 11px;
-    color: var(--aihub-text-secondary);
+    font-size: 0.8rem;
+    color: var(--audit-text-muted);
+    font-family: monospace;
+    background: var(--audit-light);
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+    margin-top: 0.25rem;
 }
 
-/* ===== DESCRIPTION ===== */
+body.staff-dark-mode .aihub-audit-entity-id {
+    background: rgba(255,255,255,0.1);
+}
+
 .aihub-audit-description {
-    font-size: 12px;
-    color: var(--aihub-text-secondary);
-    line-height: 1.5;
-    word-break: break-word;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--audit-text-muted);
 }
 
-/* ===== IP ADDRESS ===== */
 .aihub-audit-ip {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    color: var(--aihub-text-secondary);
+    font-family: monospace;
+    font-size: 0.85rem;
+    background: var(--audit-light);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    display: inline-block;
 }
 
-/* ===== ACTION BUTTONS ===== */
+body.staff-dark-mode .aihub-audit-ip {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Buttons */
 .aihub-audit-btn-icon {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--audit-border);
+    background: white;
+    color: var(--audit-text-muted);
+    display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    border: none;
+    transition: all 0.2s;
     cursor: pointer;
-    transition: all 0.3s ease;
-    background: var(--aihub-info);
-    color: white;
 }
 
     .aihub-audit-btn-icon:hover {
-        transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-
-    .aihub-audit-btn-icon i {
-        font-size: 14px;
+        background: var(--audit-primary);
+        color: white;
+        border-color: var(--audit-primary);
     }
 
 .aihub-audit-no-data {
-    color: var(--aihub-text-secondary);
-    font-size: 13px;
+    color: var(--audit-text-muted);
+    font-style: italic;
 }
 
-/* ===== EMPTY STATE ===== */
+/* ========== EMPTY STATE ========== */
 .aihub-audit-empty-state {
     text-align: center;
-    padding: 80px 20px;
-    background: var(--aihub-bg-primary);
-    border-radius: 16px;
-    box-shadow: 0 2px 12px var(--aihub-shadow);
-    border: 1px solid var(--aihub-border-color);
+    padding: 4rem 2rem;
+    color: var(--audit-text-muted);
 }
 
     .aihub-audit-empty-state i {
-        font-size: 80px;
-        color: var(--aihub-border-color);
-        margin-bottom: 24px;
-        opacity: 0.5;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
     }
 
     .aihub-audit-empty-state h4 {
-        color: var(--aihub-text-primary);
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 12px;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        color: var(--audit-text);
     }
 
-    .aihub-audit-empty-state p {
-        color: var(--aihub-text-secondary);
-        font-size: 14px;
-    }
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 991px) {
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
     .aihub-audit-container {
-        padding: 20px;
+        padding: 1rem;
     }
 
     .aihub-audit-header {
-        padding: 20px 24px;
+        padding: 1.5rem;
     }
 
-    .aihub-audit-title {
-        font-size: 24px;
-    }
-
-    .aihub-audit-filters .aihub-audit-form-row {
+    .aihub-audit-form-row {
         flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
     }
 
-    .aihub-audit-filters .aihub-audit-form-col {
-        min-width: 100%;
+    .aihub-audit-form-col {
+        width: 100%;
     }
 
-    .aihub-audit-filters .aihub-audit-form-col-auto {
+    .aihub-audit-form-col-auto {
         width: 100%;
     }
 
     .aihub-audit-btn {
         width: 100%;
     }
-
-    .aihub-audit-table {
-        font-size: 12px;
-    }
-
-        .aihub-audit-table thead th {
-            padding: 14px 8px;
-            font-size: 11px;
-        }
-
-        .aihub-audit-table tbody td {
-            padding: 12px 8px;
-        }
-}
-
-@media (max-width: 576px) {
-    .aihub-audit-container {
-        padding: 16px;
-    }
-
-    .aihub-audit-header {
-        padding: 16px 20px;
-    }
-
-    .aihub-audit-title {
-        font-size: 20px;
-    }
-
-        .aihub-audit-title i {
-            font-size: 20px;
-        }
-
-    .aihub-audit-filters {
-        padding: 20px;
-    }
-
-    .aihub-audit-user-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .aihub-audit-timestamp {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-    }
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes aihub-audit-fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.aihub-audit-header,
-.aihub-audit-filters,
-.aihub-audit-table,
-.aihub-audit-empty-state {
-    animation: aihub-audit-fadeIn 0.5s ease-out;
-}
-
-/* ===== DARK MODE ADJUSTMENTS ===== */
-body.dark-mode .aihub-audit-form-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4A459' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }

@@ -387,8 +387,6 @@ namespace AIHUBOS.Controllers
 			return View();
 		}
 
-		// POST: Login - JSON Response
-		// POST: Login - JSON Response
 		[HttpPost]
 		public async Task<IActionResult> LoginJson([FromBody] LoginViewModel model)
 		{
@@ -471,17 +469,14 @@ namespace AIHUBOS.Controllers
 				return Json(new { success = false, message = "Tài khoản đã bị khóa. Vui lòng liên hệ Admin" });
 			}
 
-			// ✅ SUCCESS - SET SESSION
+			// ✅ SUCCESS - SET SESSION (CHO TẤT CẢ CÁC ROLE)
 			HttpContext.Session.SetInt32("UserId", user.UserId);
 			HttpContext.Session.SetString("Username", user.Username);
 			HttpContext.Session.SetString("FullName", user.FullName);
 			HttpContext.Session.SetString("RoleName", user.Role.RoleName);
 			HttpContext.Session.SetString("Avatar", user.Avatar ?? "/images/default-avatar.png");
-
-			// ⭐⭐⭐ CRITICAL: THÊM DÒNG NÀY ⭐⭐⭐
 			HttpContext.Session.SetString("IsTester", user.IsTester ? "1" : "0");
 
-			// ✅ NẾU CÓ DEPARTMENT
 			if (user.DepartmentId.HasValue)
 				HttpContext.Session.SetInt32("DepartmentId", user.DepartmentId.Value);
 
@@ -506,19 +501,24 @@ namespace AIHUBOS.Controllers
 			{ "Device", GetDeviceType(Request.Headers["User-Agent"].ToString()) },
 			{ "IP", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown" },
 			{ "LoginTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
-			{ "IsTester", user.IsTester } // ✅ LOG IsTester
+			{ "IsTester", user.IsTester }
 				}
 			);
 
-			// ✅ REDIRECT THEO ROLE VÀ IsTester
+			// ✅ REDIRECT LOGIC - LINH HOẠT
 			string redirectUrl;
 
 			if (user.Role.RoleName == "Admin")
+			{
+				// Admin → Admin Dashboard
 				redirectUrl = "/Admin/Dashboard";
-			else if (user.Role.RoleName == "Tester" || user.IsTester)
-				redirectUrl = "/Staff/Dashboard"; // ✅ Staff có IsTester=1 → Tester Dashboard
+			}
 			else
+			{
+				// TẤT CẢ CÁC ROLE KHÁC → Staff Dashboard
+				// (Staff, Tester, Manager, Guest, bất kỳ role nào...)
 				redirectUrl = "/Staff/Dashboard";
+			}
 
 			return Json(new
 			{
@@ -527,6 +527,10 @@ namespace AIHUBOS.Controllers
 				redirectUrl = redirectUrl
 			});
 		}
+
+
+
+
 
 		// GET: Register - ADMIN ONLY
 		[HttpGet]

@@ -19,7 +19,11 @@ public partial class UserTask
 
     public string? Status { get; set; }
 
+    public int? TesterId { get; set; }
+
     public virtual Task Task { get; set; } = null!;
+
+    public virtual User? Tester { get; set; }
 
     public virtual User User { get; set; } = null!;
 }
