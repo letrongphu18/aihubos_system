@@ -622,7 +622,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Document",
@@ -677,19 +677,6 @@
               "IsPinned": true
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Dockerfile",
-              "DocumentMoniker": "E:\\AIHUB TASK\\AIHUBSYSTEM\\aihubos_system\\AIHUBOS\\TMD\\Dockerfile",
-              "RelativeDocumentMoniker": "TMD\\Dockerfile",
-              "ToolTip": "E:\\AIHUB TASK\\AIHUBSYSTEM\\aihubos_system\\AIHUBOS\\TMD\\Dockerfile",
-              "RelativeToolTip": "TMD\\Dockerfile",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-11-30T11:03:00.116Z",
-              "EditorCaption": ""
-            },
-            {
               "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             },
@@ -708,6 +695,19 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Dockerfile",
+              "DocumentMoniker": "E:\\AIHUB TASK\\AIHUBSYSTEM\\aihubos_system\\AIHUBOS\\TMD\\Dockerfile",
+              "RelativeDocumentMoniker": "TMD\\Dockerfile",
+              "ToolTip": "E:\\AIHUB TASK\\AIHUBSYSTEM\\aihubos_system\\AIHUBOS\\TMD\\Dockerfile",
+              "RelativeToolTip": "TMD\\Dockerfile",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-11-30T11:03:00.116Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -743,8 +743,7 @@
               "RelativeToolTip": "TMD\\Views\\Admin\\KPIDashboard.cshtml",
               "ViewState": "AgIAAKcBAAAAAAAAAAAQwLkBAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-28T04:47:24.898Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-28T04:47:24.898Z"
             },
             {
               "$type": "Document",
@@ -756,8 +755,7 @@
               "RelativeToolTip": "TMD\\appsettings.json",
               "ViewState": "AgIAABgAAAAAAAAAAAAAACkAAABdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-26T07:51:39.621Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-26T07:51:39.621Z"
             },
             {
               "$type": "Document",

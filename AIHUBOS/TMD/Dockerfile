@@ -1,16 +1,23 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
+﻿# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
 WORKDIR /src
 
-COPY TMD/TMD/TMD.csproj ./TMD.csproj
-RUN dotnet restore "./TMD.csproj"
+# Copy csproj
+COPY aihubos_system/TMD.csproj ./TMD/
+RUN dotnet restore "./TMD/TMD.csproj"
 
-COPY TMD/. ./TMD/
+# Copy full source
+COPY aihubos_system/. ./TMD/
 WORKDIR /src/TMD
 
+# Publish
 RUN dotnet publish -c Release -o /app/publish
 
+# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview AS final
 WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
 
-COPY --from=build /app/publish ./
 ENTRYPOINT ["dotnet", "TMD.dll"]
